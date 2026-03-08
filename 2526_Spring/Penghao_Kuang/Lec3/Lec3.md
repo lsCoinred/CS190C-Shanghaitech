@@ -19,7 +19,7 @@ style: |
 ---
 
 # CS190C Lec3
-Iterations of Transformer
+Evolution of the Transformer
 
 ---
 
@@ -43,25 +43,27 @@ Iterations of Transformer
 
 ---
 
-## 1.Encoder model
+## 1. Encoder model
 
-<div style="display: flex;">
+<div style="display: flex; gap: 30px;">
 
-<div style="flex: 0.4; padding-right: 5px;">
+<div style="flex: 0.4;">
 
 <p align="center">
-    <img src="2.png" width=300>
+    <img src="pics/2.png" width=300>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
-One of encoder models is BERT. It is actually the encoder part of Original Transformer. https://arxiv.org/abs/2104.09864
+### [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805)
+* Based on the encoder part of the original Transformer.
 
-* **What can it do**: Given a masked sentence `Andrew Ng [MASK] an ML researcher.` It can infer the embedding of all `[MASK]`s.
-* **How to train it**: `MLM` (masked language model) method: given sentences with masks at a certain ratio. Compare its output with standard answer for `[MASK]`
-* Good at tasks about understanding the text, but poor in generating.
+* **What it does**: 
+  * Given a masked sentence.
+    * `Andrew Ng [MASK] an ML researcher.` 
+  * It can predict the embedding of all `[MASK]` tokens using bidirectional context.
 
 </div>
 
@@ -69,27 +71,52 @@ One of encoder models is BERT. It is actually the encoder part of Original Trans
 
 ---
 
-## 2.Decoder model
+## 1. Encoder model
 
-<div style="display: flex;">
+<div style="display: flex; gap: 30px;">
 
-<div style="flex: 1.2; padding-right: 5px;">
+<div style="flex: 0.4;">
 
 <p align="center">
-    <img src="4.png" width=650>
+    <img src="pics/2.png" width=300>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
+
+### [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805)
+
+* **How it is trained**: **MLM** (Masked Language Model)
+  * Predict a certain percentage of input tokens. These tokens are either replaced with `[MASK]`, a random token, or left unchanged.
+  * Trained by comparing its predictions against the ground-truth original words.
+* Good at natural language understanding tasks, but not designed for text generation.
+
+</div>
+
+</div>
+
+---
+
+## 2. Decoder model
+
+<div style="display: flex; gap: 20px;">
+
+<div style="flex: 1.3;">
+
+<p align="center">
+    <img src="pics/4.png" width=650>
+</p>
+
+</div>
+
+<div style="flex: 1;">
 
 <br>
 
-One of decoder models is GPT-3.  https://arxiv.org/abs/2005.14165
-
-It is the right part of the image: 
-* Remove encoder of Original Transformer.
-* Remove cross-attention of Original Transformer.
+### GPT-3 
+* In [Language Models are Few-Shot Learners](https://arxiv.org/abs/2005.14165)
+* Remove encoder and cross-attention in original Transformer.
 
 </div>
 
@@ -97,25 +124,29 @@ It is the right part of the image:
 
 ---
 
-## 2.Decoder model
+## 2. Decoder model
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px;">
 
-<div style="flex: 0.3; padding-right: 5px;">
+<div style="flex: 0.3;">
 
 <p align="center">
-    <img src="3.png" width=200>
+    <img src="pics/3.png" width=200>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
-* **What can it do**: Given a sentence, and it can autoregressively decode: 
-  * Predict next token based on the given sentence now.
-  * Add predicted token to "given sentence" then.
-* **How to train it**: `CLM` (causal language model) method: given an input sentence and an output sentence. Compare the output of model based on input sentence with the standard output sentence. (More in Lec 6)
-* Good at generating. But perform not as good as Encoder for understanding tasks. (Only unidirectional attention)
+#### GPT-3
+* **What it does**: Given an input, it auto-regressively decode: 
+  * Predicts the next token based on the current sequence.
+  * Iteratively appends the predicted token to the sequence.
+* **How it is trained**: **CLM** (Causal Language Model)
+  * Trained on continuous text to predict the next token.
+  * Comparing its predicted next token against the ground-truth actual word in the text. *(More in Lec 6)*
+* Excellent at text generation. But perform not as well as encoder models for understanding tasks.
+  * Only unidirectional attention
 
 </div>
 
@@ -123,24 +154,39 @@ It is the right part of the image:
 
 ---
 
-## 3.Encoder-Decoder model
+## 3. Encoder-Decoder model
 
-Similar to Original Transformer. One of this kind of model is T5. https://arxiv.org/abs/1910.10683
+Based on the original Transformer design. 
+* **T5**: [Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer](https://arxiv.org/abs/1910.10683)
 
-Good at tasks like Seq2Seq. But this kind of models are now almost completely replaced by Decoder models.
-
-* Training method: mask a part of sentence and try to fix it. It is not similar to "prompt+answer" format (infer task), need further finetuning.
-* For certain parameter amount, a considerable part lies in encoder. But we only need one time of encoding, and `seq_len` times of decoding. Wasted.
-* Should cache multiple groups of KVs, especially cross-attention is more complex to maintain. Cost significantly more memory.
-
----
-
-## For architecture……
-
-We will focus more on Decoder model in this course, and it is truly the most common type of architecture nowadays.
+* Strong at natural language tasks, especially Seq2Seq tasks.
+* However, currently it largely substituted by Decoder-only models.
 
 <p align="center">
-    <img src="8.png" width=575>
+    <img src="pics/23.png" width=850>
+</p>
+
+---
+
+## 3. Encoder-Decoder model
+
+* However, currently it largely substituted by Decoder-only models.
+  * Trained by masking and reconstructing text spans. 
+    * Differs from the standard "prompt + answer" format in inference. 
+    * Relies heavily on downstream fine-tuning.
+  * In inference, the encoder runs only once, while the decoder runs auto-regressively for many steps. 
+    * Considerable part of parameters in the encoder are underutilized.
+  * Requires maintaining separate KV caches for both decoder self-attention and encoder-decoder cross-attention. 
+    * Increases architectural complexity and memory consumption.
+
+---
+
+## Summary on architecture
+
+In this course, we will focus primarily on **Decoder-only models**, as they are currently the dominant architecture in modern LLMs.
+
+<p align="center">
+    <img src="pics/8.png" width=575>
 </p>
 
 ---
@@ -151,91 +197,81 @@ We will focus more on Decoder model in this course, and it is truly the most com
 
 ## PART2.1: RoPE
 
-https://arxiv.org/abs/2104.09864
+[RoFormer: Enhanced Transformer with Rotary Position Embedding](https://arxiv.org/abs/2104.09864)
 
 ---
 
 ## Position embedding
 
-Original Transformer use sine position encoding, but as we discussed in Lec2, it has several disadvantages, especially the problem of absolute position index and problems of very long sentences in inference cause by it.
-
-Most LLMs nowadays use RoPE as position embedding method.
-
----
-
-## RoPE
-
-$\vec{x} \Rightarrow R_i\vec{x}$ ($\vec{x} \in R^d$,$d$ is even)
-
-Divide the d-dimensional vector into several sub-segments of length 2, resulting in a total of $d/2$ sub-segments, each sub-segment makes a rotation of angle $\theta_{i,k}$ . (Proportional to position $i$)
-
-$$
-R^i = 
-\begin{bmatrix}
-R^i_1 & 0 & 0 & \cdots & 0 \\
-0 & R^i_2 & 0 & \cdots & 0 \\
-0 & 0 & R^i_3 & \cdots & 0 \\
-\vdots & \vdots & \vdots & \ddots & \vdots \\
-0 & 0 & 0 & \cdots & R^i_{d/2}
-\end{bmatrix}
-\quad
-R^i_k = 
-\begin{bmatrix}
-\cos(\theta_{i,k}) & -\sin(\theta_{i,k}) \\
-\sin(\theta_{i,k}) & \cos(\theta_{i,k})
-\end{bmatrix}.
-$$
-
-where  $\theta_{i,k} = \frac{i}{\Theta^{2k/d}}$ 
+* **Original Transformer:** **Sinusoidal positional encoding**.
+* **Limitations (Review from Lec 2):** 
+  * Absolute position indices.
+  * Struggles in inference for sequences longer than those seen during training.
+* **The Modern LLM:** **RoPE (Rotary Position Embedding)**.
 
 ---
 
-<style scoped>
-div > div {
-  font-size: 0.73em;
-}
-</style>
+## RoPE: Rotary Position Embedding
 
-## RoPE
-
+Apply the rotation: $\bm{x} \mapsto \bm{R}^i\bm{x}$.
+* Given a embedding $\bm{x} \in \mathbb{R}^d$ (where $d$ is even) at position $i$:
+* Divide the $d$-dimensional vector into $d/2$ pairs (2D sub-spaces).
+* Rotate each pair by an angle $\theta_{i,k}$.
 $$
-R^i = 
+\bm{R}^i =
 \begin{bmatrix}
-R^i_1 & 0 & 0 & \cdots & 0 \\
-0 & R^i_2 & 0 & \cdots & 0 \\
-0 & 0 & R^i_3 & \cdots & 0 \\
+\bm{R}^i_1 & 0 & 0 & \cdots & 0 \\
+0 & \bm{R}^i_2 & 0 & \cdots & 0 \\
+0 & 0 & \bm{R}^i_3 & \cdots & 0 \\
 \vdots & \vdots & \vdots & \ddots & \vdots \\
-0 & 0 & 0 & \cdots & R^i_{d/2}
-\end{bmatrix}
-\quad
-R^i_k = 
+0 & 0 & 0 & \cdots & \bm{R}^i_{d/2}
+\end{bmatrix},
+\quad \text{where}
+\begin{cases}
+\bm{R}^i_k =
 \begin{bmatrix}
 \cos(\theta_{i,k}) & -\sin(\theta_{i,k}) \\
 \sin(\theta_{i,k}) & \cos(\theta_{i,k})
-\end{bmatrix}.
+\end{bmatrix}, \\
+\theta_{i,k} = \dfrac{i}{\Theta^{2k/d}} .
+\end{cases}
 $$
 
-<div style="display: flex;">
+---
 
+## RoPE: Rotary Position Embedding
 
+$$
+\bm{R}^i =
+\mathrm{diag}\left(\bm{R}^i_1, \bm{R}^i_2, \dots, \bm{R}^i_{d/2} \right),
+\text{where }
+\bm{R}^i_k =
+\begin{bmatrix}
+\cos(\theta_{i,k}) & -\sin(\theta_{i,k}) \\
+\sin(\theta_{i,k}) & \cos(\theta_{i,k})
+\end{bmatrix},
+$$
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="display: flex; gap: 10px;"> 
 
-The transformation caused by position, is only related to relative position.
+<div style="flex: 1;">
 
-Property of matrix  $R$ :  $R^{m}(R^n)^T = R^{m-n}$ (Transpose is inverse, multiply is add in power)
+The attention score with RoPE depends only on relative position.
 
-In the attention mechanism, for the query vector  $q_i$  at position  $i$  and the key vector  $k_j$  at position  $j$ :
-* $q'_i = R^iq_i,\ k'_j = R^jk_j$
-* $(q'_i)^T k'_j = q_i^T (R^{i})^T (R^j) k_j^T = q_i^T R^{j-i} k_j$
+* Property of rotation matrix $\bm{R}$: $\bm{R}^m(\bm{R}^n)^T = \bm{R}^{m-n}$
+  * Transpose = inverse, Multiplication → Addition of powers. 
+
+* In the attention mechanism, given a query $\bm{q}_i$ at position $i$ and a key $\bm{k}_j$ at position $j$:
+  $$\bm{q}'_i = \bm{R}^i\bm{q}_i, \quad \bm{k}'_j = \bm{R}^j\bm{k}_j$$
+  $$(\bm{q}'_i)^T \bm{k}'_j = \bm{q}_i^T (\bm{R}^i)^T \bm{R}^j \bm{k}_j = \bm{q}_i^T \bm{R}^{j-i} \bm{k}_j$$
 
 </div>
 
-<div style="flex: 0.35; padding-right: 0px;">
+<div style="flex: 0.3;">
 
 <div style="display: flex; align-items: center; height: 100%;">
     <p align="center" style="width: 100%;">
-        <img src="11.png">
+        <img src="pics/11.png">
     </p>
 </div>
 
@@ -247,21 +283,22 @@ In the attention mechanism, for the query vector  $q_i$  at position  $i$  and t
 
 ## How to understand it?
 
-$(q'_i)^T k'_j = q_i^T (R^{i})^T (R^j) k_j^T = q_i^T R^{j-i} k_j$
+$$(\bm{q}'_i)^T \bm{k}'_j = \bm{q}_i^T (\bm{R}^i)^T \bm{R}^j \bm{k}_j = \bm{q}_i^T \bm{R}^{j-i} \bm{k}_j$$
 
-* Rotate $p$ and $q$ with their absolute position, and pure relative rotation without any other transformation (like addition) causes relative position.
-  * Review: Sine method has absolute position related terms.
-* Only change direction, do not change length.
-  * $\|q^Tk\|=\|q\|\cdot\|k\|\cos(\Delta\theta) \Rightarrow \text{Attention logit}$
-  * If we use sine position encoding method, the influence of position embedding to length of vector is existent and uncontrollable, causing distortion in attention logits.
-  * But in RoPE, same relative position and two vectors must cause the same attention logits!
+* Rotating $\bm{q}$ and $\bm{k}$ by their absolute positions translates into a purely relative rotation ( $\bm{R}^{j-i}$ ) in the dot product.
+  * Review: Sinusoidal method leave residual absolute position terms.
+* Only change the direction of the vectors, not their length.
+  * Attention logits: $\bm{q}^T\bm{k}=\|\bm{q}\|\|\bm{k}\|\cos(\Delta\theta)$
+  * If we use sinusoidal embeddings, the addition alters the length of vectors. 
+    * This introduces uncontrollable distortion into the attention logits.
+  * But in RoPE, for any two specific vectors, the attention logit depends strictly on their relative distance!
 
 ---
 
 ## How to understand it?
 
 <p align="center">
-    <img src="14.png" width=1000>
+    <img src="pics/14.png" width=1000>
 </p>
 
 ---
@@ -272,56 +309,59 @@ $(q'_i)^T k'_j = q_i^T (R^{i})^T (R^j) k_j^T = q_i^T R^{j-i} k_j$
 
 ## Autoregressive decode task
 
-Suppose we continuation a sentence: "There are three……"
+Consider generating a sentence: `There are three...`
 
 What should we calculate in attention?
 
-* $q$ vector of token in position to predict.
-* All $k$,$v$ vectors of former tokens:`There` `are` `three`.
+* $q$ vector for the current position.
+* $k, v$ vectors for all previous tokens: `There` `are` `three`.
 
-Suppose we decode "kinds". What should we calculate in attention next turn?
+Suppose we generate `kinds`. What should we calculate in attention next turn?
 
-* $q$ vector of token in new position to predict.
-* All $k$,$v$ vectors of former tokens:`There` `are` `three` `kinds`.
+* $q$ vector for the new position.
+* $k, v$ vectors for all previous tokens: `There` `are` `three` `kinds`.
 
-We observe that we calculate $k$,$v$ vectors of `There` `are` `three` repeatedly. Can we cache it?
+Observation: We re-calculate $k$,$v$ vectors of `There` `are` `three` at each step.  
+* Can we cache them to avoid redundant computation?
 
 ---
 
 ## KV-Cache
 
-We call this method "KV-Cache": Cache all former $k$,$v$ vectors, so that time complexity is reduced from $\Theta(N^2)$ to $\Theta(N)$ for vectors calculation.
+* **KV-Cache**: Cache the $k$ and $v$ vectors of all previous tokens to avoid redundant computation.
+  * Reduces the total computational complexity from $\Theta(N^2)$ to $\Theta(N)$.
 
-However, if we try to cache all vectors, it may cost an extremely large amount of memory. Can we try to optimize it, or make a compromise between accuracy and memory?
+* **Bottleneck:** Caching all history vectors consumes a significant amount of memory.
 
-There are several methods: `MQA` `GQA` `MLA` and so on.
+* Performance-Memory Trade-off:
+  * Several methods: MQA, GQA, MLA and so on.
 
 ---
 
 ## MQA
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px;">
 
-<div style="flex: 0.5; padding-right: 5px;">
+<div style="flex: 0.5;">
 
 <p align="center">
-    <img src="5.png" width=250>
-    <img src="6.png" width=250>
+    <img src="pics/5.png" width=250>
+    <img src="pics/6.png" width=250>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
-MQA (Multi-Query Attention)
+**MQA (Multi-Query Attention)**: 
 
-* Baseline: Normal MHA.
-* MQA: For multiple heads of queries, share one group of values and keys vectors.
+* Baseline: Vanilla MHA.
+* Mechanism: All query heads share a single pair of Key and Value heads.
 
-Pros and cons?
+Pros and cons:
 
 * Greatly saves memory space.
-* However, queries of different heads can only refer to one channel of information, leading to accuracy reduction.
+* Distinct query heads are forced to share the same representation subspace, leading to performance degradation.
 
 </div>
 
@@ -331,27 +371,30 @@ Pros and cons?
 
 ## GQA
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px;">
 
-<div style="flex: 0.5; padding-right: 5px;">
+<div style="flex: 0.5;">
 
 <p align="center">
-    <img src="5.png" width=250>
-    <img src="7.png" width=250>
+    <img src="pics/5.png" width=250>
+    <img src="pics/7.png" width=250>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
 <br>
 
-GQA (Grouped-Query Attention)
+**GQA (Grouped-Query Attention)**: 
 
-* Baseline: Normal MHA.
-* GQA: Separate all heads into $G$ groups, each group share the same values and key vectors.
+* Baseline: Vanilla MHA.
+* Mechanism: Divides query heads into $G$ groups. Each group shares a single pair of Key and Value heads.
 
-Make a balance between original MHA and MQA. Numerous LLMs are using this method.
+<br>
+
+* Make a balance between the high quality of MHA and the memory efficiency of MQA.
+* Widely adopted by modern LLMs (e.g., LLaMA, Gemma).
 
 </div>
 
@@ -361,160 +404,222 @@ Make a balance between original MHA and MQA. Numerous LLMs are using this method
 
 ## A new idea
 
-* Maybe we can avoid directly store vectors, because $k$,$v$ of all heads usually not full rank combining together.
-* So we can try to compress $k$,$v$ of all heads into a small dense vector, and try to recover $k$,$v$ when needed. That is: we just need to store the small vectors, and need a little more calculation of restoration.
-* This is Multi-Head Latent Attention (MHA) proposed in Deepseek-V2.
-
-https://arxiv.org/abs/2104.09864
+* Avoid directly store vectors: the combined $k$ and $v$ across all heads are typically not full-rank.
+* Instead of storing full KV heads, we compress them into a compact Latent Vector.
+  * Store this small latent vector in the cache.
+  * Reconstruct the full vector during the attention calculation.
+* This is **Multi-Head Latent Attention (MLA)**.
+  * Proposed in [DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model](https://arxiv.org/abs/2405.04434)
 
 ---
 
-<style scoped>
-div > div {
-  font-size: 0.9em;
-}
-</style>
-
 ## MLA
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px;">
 
-<div style="flex: 0.5; padding-right: 5px;">
+<div style="flex: 0.5;">
 
 <p align="center">
-    <img src="9.png" width=400>
+    <img src="pics/9.png" width=400>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
-* Compress: $c_{KV,t}=x_tW_{DKV}$. From $R^{d_{model}}$ to $R^{d_c}$
-* We can restore $k$ in head $h$: $k_t^{(h)}=W^{h}_{UK}$, same for $v$: $v_t^{(h)}=c_{KV,t}W^{(h)}_{UV}$
-* So $\text{Score}^{(h)}=q_i^{(h)}(k_j^{(h)})^T=q_i^{(h)}(c_{KV,t}W^{(h)}_{UK})^T=[q_i^{(h)}(W^{(h)}_{UK})^T]c_{KV,j}^T$, $q_i^{(h)}(W^{(h)}_{UK})^T$ is fixed for certain token, do not need to calculate for each position.
-* So for score calculation, we just need to store $c_{KV,j}$.
-* For $\text{output}^{(h)}=\sum_j \text{Weights}^{(h)}\cdot v_j^{(h)}$ $=\sum_j \text{Weights}^{(h)}\cdot c_{KV,j}W^{(h)}_{UV}$
-* We just need to calculate $\sum_j \text{Weights}^{(h)}\cdot c_{KV,j}$, and multiply $W^{(h)}_{UV}$ at last. Still need $c_{KV,j}$ only.
+**Compression for KV**
 
-</div>
+* Compression: $\mathbf{c}_t^{KV}=W^{DKV}\mathbf{h}_t$. 
+  * Compresses $\mathbb{R}^{d_{\text{model}}}$ to $\mathbb{R}^{d_c}$.
+* Reconstruction of $k, v$:
+$$
+\mathbf{k}_{t}^C=W^{UK}\mathbf{c}_t^{KV};\quad \mathbf{v}_{t}^C=W^{UV}\mathbf{c}_t^{KV}
+$$
 
-</div>
-
----
-
-<style scoped>
-div > div {
-  font-size: 0.9em;
-}
-</style>
-
-## MLA
-
-
-<div style="display: flex;">
-
-<div style="flex: 1; padding-right: 5px;">
-
-Anything wrong?
-
-$\Rightarrow$ We haven't consider position embeddings!
-
-Can it still solid given RoPE applied?
-
-* $(qR_n)(kR_m)^T=qR_nR_m^TW_{UK}^Tc_{KV}^T$
-
-We find $R_nR_m$ is determined dynamically by position.
-
-That is: For certain token, we cannot just calculate one vector! It is not solid for RoPE!
-
-</div>
-
-<div style="flex: 1; padding-left: 5px;">
-
-We use **Decoupled RoPE**. That is: calculate score of $q,k$ vectors and positions separately.
-
-* $k_{C,i}^{(h)}=c_{KV,t}W^{(h)}_{UK}$
-* $k_{R,i}^{(h)}=RoPE(h_iW_{KR}^{(h)})$
-* $k_i^{(h)}=[k_{C,i}^{(h)},k_{R,i}^{(h)}]$
-* $q_{C,i}^{(h)}=q_{i}^{(h)}$
-* $q_{R,i}^{(h)}=RoPE(q_i^{(h)})$
-* $q_i^{(h)}=[q_{C,i}^{(h)},q_{R,i}^{(h)}]$
+* Only cache $\mathbf{c}_t^{KV}$ instead of $\mathbf{k}_{t}, \mathbf{v}_{t}$.
 
 </div>
 
 </div>
+
+**Compression for Q**
+* Compression and Reconstruction: $\mathbf{c}_t^Q = W^{DQ}\mathbf{h}_t;~ \mathbf{q}_t^C = W^{Q}\mathbf{h}_t = W^{UQ}\mathbf{c}_t^Q$
+
+* Reduces the activation memory during training.
 
 ---
 
 ## MLA
 
-* $k_i^{(h)}=[k_{C,i}^{(h)},k_{R,i}^{(h)}]$
-* $q_i^{(h)}=[q_{C,i}^{(h)},q_{R,i}^{(h)}]$
-* $\text{Score}^{(h)}=q_i^{(h)}(k_j^{(h)})^T=q_{C,i}^{(h)}(k_{C,j}^{(h)})^T+q_{R,i}^{(h)}(k_{R,j}^{(h)})^T$<br>$=q_i^{(h)}(W_{UK}^{(h)})^Tc_{KV,j}^T+q_{R,i}^{(h)}(k_{R,j}^{(h)})^T$<br>Term1 is the same as before, term 2 needs normal calculation of RoPE.
-* $\text{output}^{(h)}$ is similar as before.
+<div style="display: flex; gap: 10px;">
 
----
-
-## KV-Cache methods 
+<div style="flex: 0.5;">
 
 <p align="center">
-    <img src="10.png" width=1200>
+    <img src="pics/9.png" width=400>
+</p>
+
+</div>
+
+<div style="flex: 1;">
+
+**Reduction of Redundant Computation**
+
+$$
+\begin{aligned}
+\mathbf{q}_{t}^T\mathbf{k}_{j}
+&= \left( W^{Q}\mathbf{h}_t \right)^T \left( W^{UK}\mathbf{c}_j^{KV} \right) \\
+&= \left[ \mathbf{h}_t^T {\color{blue} (W^{Q})^T W^{UK}} \right] \mathbf{c}_j^{KV}
+\end{aligned}
+$$
+
+* We can absorb $W^{UK}$ into $W^{Q}$. 
+  * No re-computation of $\mathbf{k}$ in each step.
+  * Maintain the complexity of $\Theta(N)$.
+
+</div>
+
+</div>
+
+* Similarly for $\mathbf{v}$, we can absorb $W^{UV}$ into $W^{O}$. 
+$$
+\begin{aligned}
+\mathbf{o}_{t,i} &= \sum\mathrm{Weights}_{t,j} \mathbf{v}_{j,i}^C = W^{UV}_i \sum\mathrm{Weights}_{t,j} \mathbf{c}_{j,i}^{KV}\\
+\mathbf{u}_t &= W^O [\mathbf{o}_{t,1};\mathbf{o}_{t,2};\dots;\mathbf{o}_{t,n_h} ], 
+\end{aligned}
+$$
+
+---
+
+## MLA
+
+<div style="display: flex; gap: 10px;">
+
+<div style="flex: 1;">
+
+However, **the compression complicates RoPE**: 
+
+$$
+\begin{aligned}
+&\quad \mathrm{RoPE}(\mathbf{q}_{t})^T \mathrm{RoPE}(\mathbf{k}_{j}) \\
+&= \mathbf{q}_{t}^T \mathbf{R}^{t-j} \mathbf{k}_{j} \\
+&= ( W^{Q}\mathbf{h}_t )^T \mathbf{R}^{t-j} \left( W^{UK}\mathbf{c}_j^{KV} \right) \\
+&= \left[\mathbf{h}_t^T {\color{blue} (W^{Q})^T} {\color{red} \mathbf{R}^{t-j}} {\color{blue} W^{UK}} \right] \mathbf{c}_j^{KV}
+\end{aligned}
+$$
+
+* Because of the rotation matrix $\mathbf{R}^{t-j}$, $W^{UK}$ can not be absorbed into $W^{Q}$. 
+  * Forces the re-computation of full $\mathbf{k}$ at each step.
+
+</div>
+
+<div style="flex: 1;">
+
+Instead, we use **Decoupled RoPE**. 
+* We split $\mathbf{q},\mathbf{k}$ into **Compressed** $(C)$ and **Rotation** $(R)$ parts:
+* For attention head $i$: 
+
+$$
+\begin{aligned}
+[\mathbf{q}_{t,1}^C;\dots;\mathbf{q}_{t,n_h}^C] = \mathbf{q}_{t}^C &= W^{UQ}\mathbf{c}_t^Q  \\
+[\mathbf{q}_{t,1}^R;\dots;\mathbf{q}_{t,n_h}^R] = \mathbf{q}_t^R &= \mathrm{RoPE}(W^{QR}\mathbf{c}_t^Q) \\
+\mathbf{q}_{t,i} &= [\mathbf{q}_{t,i}^C ;\mathbf{q}_{t,i}^R] \\
+[\mathbf{k}_{t,1}^C;\dots;\mathbf{k}_{t,n_h}^C] = \mathbf{k}_{t}^C &= W^{UK}\mathbf{c}_t^{KV} \\
+\mathbf{k}_t^R &= \mathrm{RoPE}(W^{KR}\mathbf{h}_t) \\
+\mathbf{k}_{t,i} &= [\mathbf{k}_{t,i}^C ;\mathbf{k}_t^R]
+\end{aligned}
+$$
+
+</div>
+
+</div>
+
+---
+
+## MLA
+
+Now for new vectors $\mathbf{k}_{t,i} = [\mathbf{k}_{t,i}^C ;\mathbf{k}_t^R]$ and $\mathbf{q}_{t,i} = [\mathbf{q}_{t,i}^C ;\mathbf{q}_{t,i}^R]$: 
+
+$$
+\begin{aligned}
+\mathbf{q}_{t,i}^T\mathbf{k}_{j,i} 
+&= \underbrace{(\mathbf{q}_{t,i}^{C})^T\mathbf{k}_{j,i}^C}_{\text{Compressed}} + \underbrace{(\mathbf{q}_{t,i}^{R})^T\mathbf{k}_j^R}_{\text{Rotation}} \\ 
+&= \left[ (\mathbf{c}_t^Q)^T ( W^{UQ}_i )^T W^{UK}_i \right] {\color{blue}\mathbf{c}_j^{KV}} + \mathrm{RoPE}(W^{QR}\mathbf{c}_t^Q)^T {\color{blue}\mathbf{k}_j^R }\\
+\end{aligned}
+$$
+
+* By caching $\mathbf{c}_j^{KV}$ and $\mathbf{k}_j^R$, we avoid recomputation.
+
+$$
+(\mathbf{q}_{t,i}^{R})^T\mathbf{k}_j^R = (\mathbf{c}_t^Q)^T (W^{QR}_i)^T \cdot \mathbf{R}^{t-j} \cdot W^{KR}\mathbf{h}_j
+$$
+
+* By isolating RoPE entirely to the second term of the dot product, positional information is successfully injected without breaking the compression.
+
+---
+
+## Summary on Reducing KV Cache 
+
+<p align="center">
+    <img src="pics/10.png" width=1200>
 </p>
 
 
 ---
 
-## PART2.3: Sparse attention
+## PART2.3: Sparse Attention
 
 ---
 
-The time complexity of calculating attention is $\Theta(N^2)$. The most important cost is calculation of $QK^T$.
+## Efficient Attention Calculation
 
-So, can we optimize the calculation method to achive a banlance between accuracy and time efficiency?
-
-We try to calculate sparse attention. That is: only calculate a part of logits according the designed rules.
+* Standard attention time complexity is $\Theta(N^2)$. The dominant computational cost is the $QK^T$ matrix multiplication.
+* $\Rightarrow$ Optimize the calculation to achieve a balance between accuracy and efficiency.
+* **Solution:** **Sparse Attention**
+  * Instead of the full dense matrix, we only calculate attention logits for a specific subset of token pairs according to pre-defined patterns.
 
 ---
 
 ## Sliding window attention
 
-* We only "care" about the nearest $k$ tokens. That is: we only calculate attention score in a band that is not so wide.
-* Since Transformer has multilayers, information of older tokens absorbed in bottom layers will carried in tokens in the sliding window, so all tokens can absorbed all former tokens' information indirectly.
+* We only attend to the nearest $k$ tokens. 
+  * This results in a **diagonal band** pattern in the attention matrix.
+
+* Although each layer only sees a local window, stacking multiple layers of Transformer expands the effective context length.
+* Information from previous tokens is propagated through intermediate tokens, allowing the model to indirectly capture long dependencies.
 
 <p align="center">
-    <img src="12.png" width=600>
+    <img src="pics/12.png" width=600>
 </p>
 
 ---
 
-<style scoped>
-div > div {
-  font-size: 0.9em;
-}
-</style>
-
 ## Sparse Transformer
 
-https://arxiv.org/abs/1904.10509
+<div style="display: flex; gap: 10px;">
 
-<div style="display: flex;">
+<div style="flex: 0.8;">
 
-<div style="flex: 0.8; padding-right: 5px;">
+* From [Generating Long Sequences with Sparse Transformers](https://arxiv.org/abs/1904.10509)
 
-<div style="display: flex; align-items: center; height: 100%;">
+<div style="display: flex; height: 100%;">
     <p align="center" style="width: 100%;">
-        <img src="13.png" width=600>
+        <img src="pics/13.png" width=600>
     </p>
 </div>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1; font-size: 0.9em;">
 
 * Sparse Transformer (strided)
-  * Caring about recent toknes and periodic former tokens, just like "intensive reading" and "roughly review", suitable for data approximately periodic.
+  * Attends to recent tokens and periodic previous tokens.
+    * Like "intensive reading" and "roughly review". 
+  * For periodic patterns (e.g., images, audio).
 * Sparse Transformer (fixed)
-  * Caring about modular recent tokens(such as: this line) and modular former tokens (such as: certain column), suitable for data with approximately chunk structures. 
+  * Attends to all tokens within the current local block and specific representative tokens from previous blocks.
+    * Like "current line" and "a specific column". 
+  * For chunked structures (e.g., text sections).
 
 </div>
 
@@ -532,142 +637,170 @@ https://arxiv.org/abs/1904.10509
 
 ## Original Transformer FFN
 
-$\text{FFN}(x)=\sigma(xW_1)W_2$, $W_1\in R^{d_{model}*4d_{model}}$, $W_2\in R^{4d_{model}*d_{model}}$
+$$
+\text{FFN}(x) = \sigma(xW_1) \cdot W_2
+$$
 
-What's the activation function $\sigma$?
+where $W_1\in \mathbb{R}^{d_{\text{model}}\times d_{\text{ff}}}$, $W_2\in \mathbb{R}^{d_{\text{ff}}\times d_{\text{model}}}$. 
+  * Typically, $d_{\text{ff}} = 4 d_{\text{model}}$. 
 
-In the original transformer and other early LLMs (like T5), $\text{ReLU}$ is often used.
+* What's the activation function $\sigma$?
+  * In the original transformer and other early LLMs (like T5), $\mathrm{ReLU}$ is often used.
 
-$
-\sigma(x) =
-\left\{
-\begin{array}{l}
-x, x\geq 0 \\
-0, x<0
-\end{array}
-\right.
-$
+$$
+\mathrm{ReLU}(x) =
+\begin{cases}
+x, & x\geq 0 \\
+0, & x<0
+\end{cases}
+$$
 
 ---
 
-## Pros and cons?
+## Analysis of ReLU
 
-* Easy.
-* But for gradient calculation:<br>$\frac{\partial L}{\partial x}=\frac{\partial L}{\partial \text{ReLU}(x)}\cdot \frac{\partial \text{ReLU}(x)}{\partial x}$<br>If $x<0$, $\frac{\partial \text{ReLU}(x)}{\partial x}=0$, the gradient is 0! This means parameters cannot update! Also, if $x=0$, it is non-differenciable.
-* So it has the problem of efficient updating.
+**Pros:**
+*   **Computational Efficiency:** Simple mathematical operation (thresholding at 0).
+*   **Sparsity:** Outputs true zeros, leading to sparse activations.
+
+**Cons:**
+$$
+\frac{\partial L}{\partial x}=\frac{\partial L}{\partial \mathrm{ReLU}(x)}\cdot [\mathrm{ReLU}(x) > 0]
+$$
+
+* **The Dying ReLU Problem** $(x < 0)$:
+  * When input is negative, the gradient is exactly $0$.
+  * Weights stop updating, and the neuron becomes permanently inactive.
+* **Singularity** $(x = 0)$: **Non-differentiable** at exactly $0$.
 
 ---
 
 ## SiLU / Swish
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px;">
 
-<div style="flex: 0.6; padding-right: 5px;">
+<div style="flex: 0.75;">
 
 <p align="center">
-    <img src="15.png" width=400>
+    <img src="pics/15.png" width=500>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
-$\text{SiLU}(x)=x\cdot \sigma(x)$. 
-$\sigma$ is sigmoid function: $\sigma(x)=\frac{1}{1+e^{-x}}$
 
-* Smooth and differenciable at $x=0$.
-* Avoid the problem of gradient $=0$.
+**SiLU (Sigmoid Linear Unit)**
+* **Formula:** $\mathrm{SiLU}(x) = x \cdot \sigma(x)$ 
+  *   Where $\sigma(x) = \frac{1}{1+e^{-x}}$ (Sigmoid).
+* Smooth and **differentiable** everywhere.
+* Allows non-zero gradients for negative inputs, preventing the Dying ReLU problem. 
 
-$\text{Swish}(x)=x\cdot \sigma(\beta x)$
-So SiLU is a special example of Swish.
+**Swish**
+* **Formula:** $\mathrm{Swish}(x) = x \cdot \sigma(\beta x)$
+* SiLU is a special case of Swish where $\beta = 1$.
 
 </div>
 
 </div>
 
-All commom activation functions: https://vitalab.github.io/blog/2024/08/20/new_activation_functions.html
+**Further Reading:** [Overview of Recent Activation Functions](https://vitalab.github.io/blog/2024/08/20/new_activation_functions.html)
 
 ---
 
 ## Is it enough?
 
-**Forward analysis**: We try to discover what's the activation elements of FFN like.
+**Forward Analysis:** Examining the representation capacity of the activation elements.
 
-$y_i=\sigma(\sum_j x_j(W_1)_{ji})$
+$$
+y_i = \sigma \left( \sum_j x_j[W_1]_{ji} \right)
+$$
 
-We find it a combination of first order interaction terms. It is hard to explicitly capture higher order interactions.
+* The output is primarily a non-linear transformation of first-order linear combinations of $W_1$. 
+* It struggles to explicitly capture higher-order interactions. 
 
 ---
 
 ## Is it enough?
 
-**Backward analysis**: We try to calculate how gradients of this network change.
+**Backward Analysis:** Examining the gradient flow during backpropagation.
 
-$y=\sigma(xW_1)$
-$\Rightarrow \frac{\partial L}{\partial x}=\frac{\partial L}{\partial y}\frac{\partial y}{\partial x}=(\frac{\partial L}{\partial y} \odot \sigma'(z))\cdot W^T$  (Tips:$z=xW_1$)
+Let $z = xW_1, y = \sigma(z)$, 
 
-For a considerable part of activation functions, $0<\sigma'(z)<1$. So if $\sigma'(z)<<1$ or number of layers is large, the gradient is easy to vanish.
+$$
+\frac{\partial L}{\partial x} = \left( \frac{\partial L}{\partial y} \odot \sigma'(z) \right) \cdot W_1^T
+$$
 
----
-
-## GLU
-
-There's a way to solve this problem: Build another path also derive from the input $x$, that is a gate. Use a function $\sigma$ to activate the values of gate, and do element-wise multiplication with $xV$.
-
-That is:
-
-* $y=(xV) \odot \sigma(xW_1)$ (That is: linear path and activated gate)
-* $\text{output}=yW_2$
-
-Compared with original FFN, one gate is added to dynamically control the activations of input.
-
-We call it gate activation. This structure is called GLU.
+* For many common activation functions, $0<\sigma'(z)<1$.
+* So if $\sigma'(z) \ll 1$, repeated element-wise multiplication over a large number of layers causes the gradients to shrink exponentially. 
+  * This leads to the Vanishing Gradient Problem.
 
 ---
 
-## GLU
+## Gated Linear Units (GLU)
 
-Different activation function $\sigma$ determine different kinds of GLUs.
+**Solution**: Introduces a **gating** path to control information flow.
+* Gate: Use a function $\sigma$ to activate the values of $xW_1$.
+* Value: Do element-wise multiplication with $xV$.
+
+$$
+\mathrm{FFN}(x) = (\sigma(xW_1) \odot xV) W_2
+$$
+
+* Compared with original FFN, an element-wise gate is added to dynamically control the activations of input.
+  * Called **gate activation**. 
+* This structure is called **Gated Linear Units (GLU)**.
+
+---
+
+## Gated Linear Units (GLU)
+
+The choice of the activation function $\sigma$ defines the specific GLU variant.
 
 * $\text{FFN}_{\text{ReGLU}}(x, W_1, V, W_2) = (\text{ReLU}(xW_1) \odot xV) W_2$
 * $\text{FFN}_{\text{GeGLU}}(x, W_1, V, W_2) = (\text{GeLU}(xW_1) \odot xV) W_2$
 * $\text{FFN}_{\text{SwiGLU}}(x, W_1, V, W_2) = (\text{Swish}(xW_1) \odot xV) W_2$
 
-Many modern LLMs, such as LLAMA, are using SwiGLU as FFN.
-
-So what's the advantage of them?
+Many modern LLMs are using SwiGLU as FFN (e.g., **LLaMA**).
 
 ---
 
-## Forward analysis
+## Advantage of GLU: Forward analysis
 
-$y=(xV) \odot \sigma(xW_1)$
-$\Rightarrow y_i=\text{Swish}(\sum_kx_kW_{k,i})(\sum_jx_jV_{j,i})$
+$$
+y_i = \underbrace{\text{Swish}\left(\sum_k x_k W_{k,i}\right)}_{\text{Gate}} \cdot \underbrace{\left(\sum_j x_j V_{j,i}\right)}_{\text{Value}}
+$$
 
-That is a combination of second order interaction terms ($c_{ij}x_ix_j$). Comparing with original FFN, it can explicitly modeling higher order interactions.
-
----
-
-## Backward analysis
-
-$y=(xV) \odot \sigma(xW_1)$
-$\Rightarrow \frac{\partial L}{\partial x}=\frac{\partial L}{\partial y}\frac{\partial y}{\partial x}=\frac{\partial L}{\partial y}[(\sigma(z)V^T)+(xV)\odot \sigma'(z)W_1^T]$
-
-For $\sigma(z)V^T+(xV)\odot \sigma'(z)W_1^T$:
-* Term2 may also vanished because $\sigma'(z)$ may be small.
-* But term 1 is depended on value of activated gate $\sigma(z)$: if the gate is open, the gradients will flows through.
-
-So it avoid gradient vanishing, and parameters' updating is controlled by the gate. 
+* The output is a combination of second-order interaction terms ($c_{ij} x_i x_j$). 
+* Comparing with original FFN, it can explicitly model higher-order interactions.
 
 ---
 
-## New scale
+## Advantage of GLU: Backward analysis
 
-Comparing with the original FFN, there exist a new learnable matrix (the gate).
+Gradient Flow of $y=(xV) \odot \sigma(xW_1)$:
+$$
+\frac{\partial L}{\partial x} = \frac{\partial L}{\partial y} \Big[ \underbrace{\sigma(z) V^T}_{\text{Value Path}} + \underbrace{(xV) \odot \sigma'(z) W_1^T}_{\text{Gated Path}} \Big]
+$$
 
-In order to make number of parameters equals to original FFN (with $d_{ff}=4d_{model}$), we should change $d_{ff}$ of SwiGLU.
+* Term of gated path may still vanish since $\sigma'(z)$ may be small.
+* But Term of value path is depended on value of activated gate $\sigma(z)$: 
+  * If the gate is open, the gradients will flow through.
 
-$d_{ff}=\frac{8}{3}d_{model}$
+This structure effectively mitigates the vanishing gradient problem, as parameter updates are dynamically controlled by the gate.
+
+---
+
+## Dimension Adjustment
+
+* Compared to the original FFN, GLU introduces an extra learnable matrix
+  * The linear weights $V$.
+
+* To maintain the same parameter count as the original FFN (where $d_{ff} = 4d_{model}$), we must reduce the dimension $d_{ff}$:
+
+$$
+d'_{ff} = \frac{2}{3} \times 4d_{model} = \frac{8}{3}d_{model}
+$$
 
 ---
 
@@ -675,49 +808,53 @@ $d_{ff}=\frac{8}{3}d_{model}$
 
 ---
 
-## For an extremly large LLM
+## The Challenge of Scaling Dense LLMs
 
-We want to design a model structure with huge number of parameters. What can we do?
+**The Goal:** Design a model with a massive number of parameters to increase reasoning capacity and world knowledge.
 
-* Of course you can scale up the original transformer. But one of the problems is: The larger model means the longer inference time. The model may be extremly slow because of the large scale matrix calculation.
+* Simply scale up the original transformer. 
+* Problems: In **Dense Model**, every parameter is used for every token.
+  * Larger models require massive dense matrix multiplications, meaning inference time and computational cost increase linearly with model size.
 
-There exist a new method: Mixture of Experts (MoE).
+<br>
+
+* A new method: **Mixture of Experts (MoE)**.
 
 ---
 
 ## Divide the work and be experts
 
-In the original Transformer, all subject of tasks share one FFN. This means the single FFN should carry all kinds of modeling works.
+In the standard Transformer, a single FFN must process all tokens. This means the single FFN should carry all kinds of modeling works simultaneously.
 
-But in real life, some heavy works always done by division of labor: Everyone does different things and excels in their own ways.
+But in the real world, complex work is usually accomplished through division of labor, where different people take on different roles and excel in their own ways.
 
-This is mixture of experts: 
+This is **Mixture-of-Experts (MoE)**: 
 
-* Use multiple FFN, each FFN represents a subject.
-* For each token, decide which FFN to enable.
-* Only use a few, even one of them.
-* The model has a huge number of parameters, but the inference speed almost unchange.
+* Use multiple FFN, , each specializing in different subjects.
+* For each token, a gating mechanism determines which FFNs to activate.
+* For any given token, only a small subset of experts are activated.
+* Total parameter count scales up massively, but the inference speed remains almost unchanged.
 
 ---
 
 ## MoE
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px;">
 
-<div style="flex: 0.8; padding-right: 5px;">
+<div style="flex: 0.75;">
 
 <p align="center">
-    <img src="16.png" width=800>
+    <img src="pics/16.png" width=800>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
-* For each token, enter router layer first.
-* The router layer is usually a linear activation+softmax.
-* Sample top k experts (k is very small) according to the distribution.
-* For k FFN outputs, weight and accumulate them as the final output.
+* For each token, it first enters the router layer.
+* The router layer is linear layer followed by a softmax activation.
+* The router selects the top-k experts (where $k$ is very small) according to the probability distribution.
+* The outputs of the selected $k$ FFNs are weighted and summed to produce the final output.
 * Others remain the same.
 
 </div>
@@ -729,10 +866,8 @@ This is mixture of experts:
 ## More parameters and same FLOP
 
 <p align="center">
-    <img src="17.png" width=900>
+    <img src="pics/17.png" width=900>
 </p>
-
-
 
 ---
 
@@ -744,59 +879,68 @@ This is mixture of experts:
 
 ---
 
-## Batch Norm
+## Batch Normalization (Batch Norm)
 
-We use `batch_size` samplings to run a training step. This means we need to do `batch_size` forward process in parallel. For each tensor in the embedding process, we do normalization for each element based on **`batch_size` elements at the same position**.
+**Batch**: In each training step, `batch_size` samples are processed in parallel. All input samples are packed into an input tensor containing the batch dimension.
+
+**Batch Norm:** Normalize the input tensor across the batch dimension, based on **`batch_size` elements at the same position**.
 
 <p align="center">
-    <img src="21.png" width=350>
+    <img src="pics/21.png" width=350>
 </p>
 
 ---
 
-## Batch Norm
+## Batch Normalization (Batch Norm)
 
-$$y_i=\frac{x_i+\mu_i}{\sqrt{\sigma_i^2+\epsilon}}\gamma_i+\beta_i$$
+$$
+y_i = \gamma \cdot \frac{x_i - \mu_{\mathcal{B}}}{\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}} + \beta
+$$
 
-$\mu_i,\sigma_i$ are calculated from `batch_size` number of elements at the same position.
+* $\mu_{\mathcal{B}}$ and $\sigma_{\mathcal{B}}$ are the mean and variance calculated over the current batch $\mathcal{B}$.
 
-We use learnable $\gamma$ and $\beta$ to restore the power of representation (For example, some features should be really big to activate the network).
+* We use learnable $\gamma$ and $\beta$ to restore representational capacity. 
+  * Without them, the normalization would force activations into a rigid standard normal distribution, potentially limiting the model's expressivity.
 
 ---
 
-## Batch Norm
+## Batch Normalization (Batch Norm)
 
-It is used more frequently in CV, but not in LLM.
+It is used frequently in vision models, but rarely used in LLM.
 
-* If batch size is small, for example, equals to 1 during inference, it is very unstable.
+* BN couples samples together. In sequence generation, tokens should ideally be processed causally, not dependent on other sentences in the batch.
 * Cause distortion of $\mu,\sigma$ for sentences with varying length (if we use padding mask).
-  * We will initially let the embedding of padding mask be $0$ or a certain vector, and it has no actually mean, which should not be included in calculation.
+  * We will initially let the embedding of padding token be $0$ or a certain vector, and it has no actually mean, which should not be included in calculation.
+* Performance degrades significantly if the batch size is small.
+
 
 ---
 
-## Layer Norm
+## Layer Normalization (Layer Norm)
 
-Compared with Batch Norm: we use `d_model` number of elements at the same tensor to calculate $\mu_i,\sigma_i$. Others are the same.
+**Layer Norm**: Normalize the input tensor across the embedding dimension, based on **$d_\text{model}$ number of elements within the same sample**, with $\mu_i$ and $\sigma_i$ calculated. 
+  * Compared with Batch Norm.
 
-$$y_i=\frac{x_i+\mu_i}{\sqrt{\sigma_i^2+\epsilon}}\gamma_i+\beta_i$$
+$$y_i=\frac{x_i-\mu_i}{\sqrt{\sigma_i^2+\epsilon}}\gamma_i+\beta_i$$
 
 Used in the original Transformer and some other LLMs, such as BERT, GPT-2.
 
 <p align="center">
-    <img src="21.png" width=350>
+    <img src="pics/21.png" width=350>
 </p>
 
 ---
 
 ## Root Mean Square Layer Norm (RMSNorm)
 
-https://arxiv.org/abs/1910.07467
+Standard LN performs two distinct operations:
+1.  **Re-centering:** Subtracting the mean ($\mu$) to make the data zero-centered.
+2.  **Re-scaling:** Dividing by the standard deviation ($\sigma$) to normalize variance.
 
-What we do in Layer Norm?
-* Re-centering (minus $\mu$)
-* Re-scaling (divide  $\sigma$)
-
-Through experiments, it turns out that Re-centering is not so important. Since normalization module will be called multiple times in forward process, can we adjust it to save FLOPs?
+From [Root Mean Square Layer Normalization](https://arxiv.org/abs/1910.07467): 
+* Through experiments, it turns out that re-centering is not so important.
+* Can we remove the mean calculation to **reduce computational overhead** without hurting performance?
+  * Since repeated use of LayerNorm increases computational overhead while LLMs grow larger and deeper.
 
 ---
 
@@ -805,8 +949,8 @@ Through experiments, it turns out that Re-centering is not so important. Since n
 $$y_i=\frac{x_i}{\text{RMS}(x)}g_i$$
 $$\text{RMS(x)}=\sqrt{\frac{1}{d}\sum_ix_i^2+\epsilon}$$
 
-* We need to walk through the tensor twice to calculate $\mu$ and $\sigma$ in LN, but once in RMSNorm.
-* Performance almost do not declined, even better in some conditions.
+* In LayerNorm, we need to traverse the tensor twice to calculate $\mu$ and $\sigma$, while RMSNorm requires only one pass.
+* Maintains comparable performance, even better in some cases.
 
 ---
 
@@ -814,44 +958,51 @@ $$\text{RMS(x)}=\sqrt{\frac{1}{d}\sum_ix_i^2+\epsilon}$$
 
 ---
 
-## Post-norm
+## Post-Norm
 
 <p align="center">
-    <img src="18.png" width=600>
+    <img src="pics/18.png" width=600>
 </p>
 
-$$x_{t+1}=\text{Norm}(x_t+F_t(x_t))$$
+$$x_{t+1}=\text{Norm}(x_t+\text{FFN}(x_t))$$
 
-That is: Normalization after calculating residual connection.
+* Normalization after calculating residual connection.
 
-Used in the original transformer and BERT.
+* Used in the original transformer and BERT.
 
 ---
 
-## Post-norm
+## Post-Norm
 
-But actually, this normalization is not so stable during training process.
+But actually, this normalization creates significant instability during training.
 
-$\frac{\partial L}{\partial x_t}=\frac{\partial L}{\partial x_{t+1}}\frac{\partial x_{t+1}}{\partial x_t}=\frac{\partial L}{\partial x_{t+1}}J_{norm,l}(I+\frac{\partial F_t}{\partial x_t})$
+**Gradient:**
+$$
+\frac{\partial L}{\partial x_t} = \frac{\partial L}{\partial x_{t+1}} \cdot J_{\text{norm}, l}\left( I + \frac{\partial F_t}{\partial x_t} \right)
+$$
 
-This means we will multiply $J_{norm,l}$ continuously, which means the hidden danger of vanishing or exploded gradient.
+During backpropagation, the gradients are multiplied by $J_{\text{norm}}$ at every layer.
+* Increases the risk of vanishing or exploding gradients.
 
-Almost all LLMs now are using pre-norm.
+To solve this,  almost all modern LLMs (e.g., GPT-3, LLaMA) utilize **Pre-Norm**. 
 
 ---
 
-## Pre-norm
+## Pre-Norm
 
-$$x_{t+1}=x_t+F_t(\text{Norm}(x_t))$$
+$$x_{t+1}=x_t+\text{FFN}(\text{Norm}(x_t))$$
 
 <p align="center">
-    <img src="19.png" width=600>
+    <img src="pics/19.png" width=600>
 </p>
 
 
-$\frac{\partial L}{\partial x_t}=\frac{\partial L}{\partial x_{t+1}}\frac{\partial x_{t+1}}{\partial x_t}=\frac{\partial L}{\partial x_{t+1}}(I+\frac{\partial F_t}{\partial x_t})$.
+$$
+\frac{\partial L}{\partial x_t}=\frac{\partial L}{\partial x_{t+1}}(I+\frac{\partial F_t}{\partial x_t})
+$$
 
-The form of this expression is similar to residual connection, and reduce the danger of gradient problems.
+* Similar to original residual connection. 
+* Reduce the danger of gradient problems.
 
 ---
 
@@ -862,7 +1013,7 @@ The form of this expression is similar to residual connection, and reduce the da
 <div style="flex: 1.8; padding-right: 5px;">
 
 <p align="center">
-    <img src="20.png" width=600>
+    <img src="pics/20.png" width=600>
 </p>
 
 </div>
@@ -882,21 +1033,21 @@ The form of this expression is similar to residual connection, and reduce the da
 
 ---
 
-## Thinking
+## Think About It
 
-_For normalization module, it seems that using `RMSNorm` cannot save much FLOPs because matrix calculation in other modules actually cost over $99\%$ FLOPs. So why do we still need `RMSNorm`?_
+_For normalization module, it seems that using `RMSNorm` cannot save much FLOPs since matrix calculation in other modules actually cost over $99\%$ FLOPs. So why do we still need `RMSNorm`?_
 
 ---
 
-## Layernorm example
+## LayerNorm Example
 
 ```Python
 mean = x.mean(dim=-1, keepdim=True) # Pass x for the 1st time
-var = x.var(dim=-1, keepdim=True) # Pass x for the 2nd time
+var = x.var(dim=-1, keepdim=True)   # Pass x for the 2nd time
 y = (x - mean) / sqrt(var + eps) * gamma + beta
 ```
 
 * When first pass `x`, we need to load `x` from global memory to calculate `mean`.
-* When pass `x` for the second time, `x` is most likely removed from cache because of the amount of resource
+* When pass `x` for the second time, `x` usually cannot stay in cache due to its large size and low reuse.
 * Comparing with matrix calculation (with mature caching mechanism), we should frequently load from global memory, which is the main bottleneck.
 * So normalization cost about $25\%$ time consumption with only $0.17\%$ FLOPs.
