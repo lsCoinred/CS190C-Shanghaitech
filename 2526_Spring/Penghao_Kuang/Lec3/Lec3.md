@@ -926,7 +926,7 @@ $$y_i=\frac{x_i-\mu_i}{\sqrt{\sigma_i^2+\epsilon}}\gamma_i+\beta_i$$
 Used in the original Transformer and some other LLMs, such as BERT, GPT-2.
 
 <p align="center">
-    <img src="pics/21.png" width=350>
+    <img src="pics/22.png" width=350>
 </p>
 
 ---
