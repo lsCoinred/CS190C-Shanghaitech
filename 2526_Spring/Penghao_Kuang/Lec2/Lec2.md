@@ -501,9 +501,9 @@ For large $N$, we multiply many terms to update parameters of bottom layers.
 
 ## The Backward Pass Perspective: Chain rule?
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 0.5; padding-right: 5px;">
+<div style="flex: 0.5;">
 
 <p align="center">
     <img src="pics/6.png" width=300>
@@ -511,7 +511,7 @@ For large $N$, we multiply many terms to update parameters of bottom layers.
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 <br><br>
 
 Adding residual connection: 
@@ -563,9 +563,9 @@ $$
 ## Layer norm
 
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 0.5; padding-right: 5px;">
+<div style="flex: 0.5;">
 
 <p align="center">
     <img src="pics/7.png" width=300>
@@ -573,7 +573,7 @@ $$
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
 <br>
 
@@ -595,9 +595,9 @@ In next lecture, we will discuss where to perform (post-norm & pre-norm), how to
 
 ---
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 0.7; padding-right: 5px;">
+<div style="flex: 0.7;">
 
 <p align="center">
     <img src="pics/8.png" width=450>
@@ -605,7 +605,7 @@ In next lecture, we will discuss where to perform (post-norm & pre-norm), how to
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
 ### Seq2Seq with Transformer
 
@@ -625,9 +625,9 @@ In next lecture, we will discuss where to perform (post-norm & pre-norm), how to
 
 ## What is Masked MHA?
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 0.7; padding-right: 5px;">
+<div style="flex: 0.7;">
 
 <p align="center">
     <img src="pics/9.png" width=400>
@@ -635,7 +635,7 @@ In next lecture, we will discuss where to perform (post-norm & pre-norm), how to
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
 For $QK^T$ matrix:
 

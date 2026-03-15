@@ -1008,9 +1008,9 @@ $$
 
 ## Summary of Transformer architecture and modules
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 1.8; padding-right: 5px;">
+<div style="flex: 1.8;">
 
 <p align="center">
     <img src="pics/20.png" width=600>
@@ -1018,7 +1018,7 @@ $$
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
 <br><br>
 
