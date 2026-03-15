@@ -214,7 +214,7 @@ In this course, we will focus primarily on **Decoder-only models**, as they are 
 ## RoPE: Rotary Position Embedding
 
 Apply the rotation: $\bm{x} \mapsto \bm{R}^i\bm{x}$.
-* Given a embedding $\bm{x} \in \mathbb{R}^d$ (where $d$ is even) at position $i$:
+* Given an embedding $\bm{x} \in \mathbb{R}^d$ (where $d$ is even) at position $i$:
 * Divide the $d$-dimensional vector into $d/2$ pairs (2D sub-spaces).
 * Rotate each pair by an angle $\theta_{i,k}$.
 $$
