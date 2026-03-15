@@ -69,13 +69,13 @@ Training and Autoregressive Decoding
 
 ## Memory Issues with Very Large Corpus
 
-- The corpus will initially encoded to a long string of numbers using BPE.
+- The corpus will initially be encoded to a long string of numbers using BPE.
 - To sample a part of it as a "sentence", a naive method is to read the whole long string into memory, and sample hundreds of numbers.
 - If the corpus is extremely large, reading all of them will bring disaster to memory.
 
 <br>
 <p align="center">
-    <img src="1.png" width="500">
+    <img src="pics/1.png" width="500">
 </p>
 
 ---
@@ -83,19 +83,20 @@ Training and Autoregressive Decoding
 ## Memory Issues with Very Large Corpus
 
 - Is there a solution that reads only specific parts needed from disk to memory?
-* `numpy.memmap`: A list that interacts directly with disk space for reading and writing, and highly similar to a regular list in other aspects. 
+* `numpy.memmap`: A list that interacts directly with disk space for reading and writing, and which is highly similar to a regular list in other aspects. 
 * We can implement `class Memmap_Manager`, containing `def save_as_memmap` and `def load_by_range`, for disk-oriented read/write operations.
-* The core idea is: Store the whole long string in the disk, only read a small part of it to memory according to our needs.
+* The core idea is: Store the whole long string on disk, only read a small part of it into memory according to our needs.
 
 ---
 
 ## Ideas
 
-We can realize this idea roughly……
-* Suppose the whole long string contains `500,000,000` numbers.
-* We can cut it into small chunks, each chunk's length= `500,000`.
-* Store these `10000` chunks into the disk.
-* Suppose we need to read `2000th-8000th` number, what chunks should we load to memory? `490,000th-1,050,000th`?
+We can implement this idea roughly...
+* Suppose the whole long string contains $500,000,000$ numbers.
+* We can cut it into small chunks, each chunk's length= $500,000$.
+* Store these $10000$ chunks on disk.
+* Suppose we need to read from $2000$-th to $8000$-th number, what chunks should we load into memory? 
+  * $490,000$-th to $1,050,000$-th ?
 * These two phases correspond to `def save_as_memmap` and `def load_by_range`.
 
 ---
@@ -104,7 +105,7 @@ We can realize this idea roughly……
 
 - Use `BPE_Tokenizer`'s `encode_iterable`, reading only a single number each time.
 - Continuously read numbers into a buffer list.
-- When the buffer reaches a certain size (e.g., 500,000 numbers), write it as a whole block to disk.
+- When the buffer reaches a certain size (e.g., $500,000$ numbers), write it as a whole block to disk.
 - Clear the buffer and continue reading and writing blocks until the corpus is finished.
 - Count the total number of integer codes in the corpus during the process.
 
@@ -115,7 +116,9 @@ That is: **saving as encoding**.
 ## 1. `def save_as_memmap`
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -123,20 +126,23 @@ Code here
 ## 1. `def save_as_memmap`
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
+
 For np.memmap:
 - Define array type and shape in advance.
 - Operate like a regular array, still stored in memory.
-- Explicit flush operation writes to disk, clearing previous memory automatically.
+- Explicit flush operation writes to disk, freeing the previously allocated memory automatically.
 
 ---
 
 ## 1. `def save_as_memmap`
 
 <p align="center">
-    <img src="2.png" width=650>
-    <img src="3.png" width=650>
+    <img src="pics/2.png" width=650>
+    <img src="pics/3.png" width=650>
 </p>
 
 
@@ -146,10 +152,10 @@ For np.memmap:
 
 ## 2. `def load_by_range`
 
-Requirement: Need to read all elements in the range `[start_idx, end_idx)` of the encoded list.
+Requirement: We need to read all elements in the range `[start_idx, end_idx)` of the encoded list.
 - Calculate: Which chunks covered?
 - Load only corresponding intervals into memory.
-- Operations are consistent with regular lists, except declaring the np.memmap type.
+- Operations are consistent with regular lists, except for declaring the `np.memmap` type.
 
 ---
 
@@ -158,20 +164,19 @@ Requirement: Need to read all elements in the range `[start_idx, end_idx)` of th
 `memmap_arr[idx_in_start:idx_in_end]`: Loads this interval from disk into memory.
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
 
-<style scoped>
-section * {
-  font-size: 0.97em !important;
-}
-</style>
-
 ## 3. Formal Sampling Operation: `class Batch_By_Memmap`
 
-**Problem1: How to sample input data?** 
+<div style="font-size: 0.9em;">
+
+### Problem1: How to sample input data?
+
 Assuming a corpus length of 10 and a single sampling sequence length of 4:
 - Dense sampling: 1234; 2345; 3456; ...
   - Too much data. If the total number of training steps is small (i.e., 3 samples), the second half of the corpus might not be covered.
@@ -181,17 +186,19 @@ Assuming a corpus length of 10 and a single sampling sequence length of 4:
   - Randomly pick a start point (ensuring it's <= 7), then continuously sample 4 characters from the start point.
   - Usually sample `batch_size` sequences simultaneously, so randomly pick `batch_size` start points to sample.
 
+<div>
+
 ---
 
 ## 3. Formal Sampling Operation: `class Batch_By_Memmap`
 
-**Problem2: What is the standard output?**
-- Review what LLM done: each vector is finally linearly projected to `vocab_size` scale weights to predict the next position's word (as the diagram below).
-- So the standard output of position-$i$ should be the $i+1$-th word in the corpus !
+### Problem2: What is the standard output?
+- Recall what the LLM does: each vector is finally linearly projected to `vocab_size`-dimensional scale weights to predict the word at the next position (as the diagram below).
+- So the standard output of position-$i$ should be the $(i+1)$-th word in the corpus!
 - That is: if the input sequence is 1234, the standard output should be 2345.
 
 <p align="center">
-    <img src="4.png" width=700>
+    <img src="pics/4.png" width=700>
 </p>
 
 ---
@@ -199,7 +206,9 @@ Assuming a corpus length of 10 and a single sampling sequence length of 4:
 ## 3. Formal Sampling Operation: `class Batch_By_Memmap`
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -213,7 +222,7 @@ Code here
 SGD: $\theta=\theta-\alpha \nabla L(\theta)$
 
 <p align="center">
-    <img src="6.png" width=600>
+    <img src="pics/6.png" width=600>
 </p>
 
 ---
@@ -222,8 +231,8 @@ SGD: $\theta=\theta-\alpha \nabla L(\theta)$
 
 What's the defect of SGD?
 
-* Zigzagging because the gradient may not stable.
-* Share the same learning rate for updating of all parameters
+* Zig-zagging since the gradient may not be stable.
+* Shares the same learning rate for all parameter updates. 
   * Some parameter, such as word embedding of `the`, may update repeatedly and significantly, leading to possible oscillation.
   * Some parameter, such as word embedding of `pneumoconiosis`, may rarely update, leading to little optimization.
 
@@ -231,11 +240,11 @@ What's the defect of SGD?
 
 ## 1. From `SGD` to `AdamW`
 
-What we do in `AdamW`?
+What `AdamW` does?
 
-* Use first moment `m` (we called "momentum") to record historical gradients information.
-* Use second moment `v` to record historical gradients fluctuation information.
-* Use first and second moment to adjust parameter update process.
+* Use first moment `m` (called **"momentum"**) to record historical gradient information.
+* Use second moment `v` to record historical gradient fluctuation information.
+* Use the first and second moments to adjust the parameter update process.
 
 ---
 
@@ -245,12 +254,12 @@ Let gradient of step $t$ be $g_t$:
 
 $$m_t=\beta_1(m_{t-1}-g_t)+g_t$$
 
-It means: $m_t=(1-\beta_1)\sum_{\tau=1}^t{\beta_1^{t-\tau}g_{\tau}}$, it is the exponential weighting of historical gradients.
+It means: $m_t=(1-\beta_1)\sum_{\tau=1}^t{\beta_1^{t-\tau}g_{\tau}}$, which is the exponential weighting of historical gradients.
 
-We use $m_t$ as the "gradient" of step $t$ instead of $g_t$, reducing zigzagging of gradient. $m_t$ now can hardly fluctuation so serious.
+We use $m_t$ as the "gradient" of step $t$ instead of $g_t$, reducing zig-zagging of gradient. $m_t$ can now hardly fluctuate as severely.
 
 <p align="center">
-    <img src="6.png" width=400>
+    <img src="pics/6.png" width=400>
 </p>
 
 ---
@@ -259,9 +268,9 @@ We use $m_t$ as the "gradient" of step $t$ instead of $g_t$, reducing zigzagging
 
 $$v_t=\beta_2(v_{t-1}-g_t^2)+g_t^2$$
 
-It means: $v_t=(1-\beta_2)\sum_{\tau=1}^t{\beta_2^{t-\tau}g_{\tau}^2}$, it is the exponential weighting of historical square of gradients.
+It means: $v_t=(1-\beta_2)\sum_{\tau=1}^t{\beta_2^{t-\tau}g_{\tau}^2}$, which is the **exponential weighting** of historical square of gradients.
 
-And also, it can understand as: Variance given `mean=0` and `exponential weights`. But what if `mean≠0`?
+Additionally, it can be understood as: Variance given $\mathrm{Mean}=0$ and exponential weights. But what if $\mathrm{Mean}\neq 0$?
 
 Suppose a sequence of gradients with the same mean value: `2,2,2,2` `3,1,3,1`, we find `3,1,3,1` still leads to larger value of $v$. So it can reflect the fluctuation of historical gradients.
 
@@ -269,12 +278,13 @@ Suppose a sequence of gradients with the same mean value: `2,2,2,2` `3,1,3,1`, w
 
 ## 1. From `SGD` to `AdamW`
 
-So how do we use these two information to adjust $\theta_t=\theta_{t-1}-\alpha g_t$?
+So how do we use this information to adjust $\theta_t=\theta_{t-1}-\alpha g_t$?
 
-* For first moment, change $g_t$ to $m_t$
-* How to make use of secomd moment?
-  * If $v$ is large: It means the gradient of parameter fluctuate seriously, such as word embedding of high frequency words. The update step should be smaller.
-  * If $v$ is small: It means the parameter rarely update, for example, the history gradient are `0,0,0,1,0,0`. The update step should be larger.
+* For the first moment, change $g_t$ to $m_t$
+* How to make use of second moment?
+  * If $v$ is large: It means the gradient of the parameter fluctuates significantly, such as for the word embedding of high-frequency words. The update step should be smaller.
+  * If $v$ is small: It means the parameter rarely updates, for example, the historical gradients are `0,0,0,1,0,0`. The update step should be larger.
+
 $$\theta_t=\theta_{t-1}-\alpha \frac{m_t}{\sqrt{v_t}+\epsilon} $$
 
 ---
@@ -283,12 +293,12 @@ $$\theta_t=\theta_{t-1}-\alpha \frac{m_t}{\sqrt{v_t}+\epsilon} $$
 
 $$\theta_t=\theta_{t-1}-\alpha \frac{m_t}{\sqrt{v_t}+\epsilon} $$
 
-Is there any hidden problem of it?
+Is there any hidden problem with it?
 
-When $t$ is small……
+When $t$ is small...
 
-* $m_1=(1-\beta_1)g_1$, $m_2=\beta_1(1-\beta_1)g_1+(1-\beta_1)g_2$……
-* Suppose all $|g_i|$ share the similar scale, so $|m_1|=(1-\beta_1)|g|,$ $|m_2|=(1-\beta_1^2)|g|$ $,\dots,|m_t|=(1-\beta_1^t)|g|$ $\Rightarrow$ The scale is distortion comparing with $|g|$
+* $m_1=(1-\beta_1)g_1$, $m_2=\beta_1(1-\beta_1)g_1+(1-\beta_1)g_2 \dots$
+* Suppose all $|g_i|$ share the similar scale, so $|m_1|=(1-\beta_1)|g|,$ $|m_2|=(1-\beta_1^2)|g|$ $,\dots,|m_t|=(1-\beta_1^t)|g|$ $\Rightarrow$ The scale is distorted compared with $|g|$
 * The same with $|v_t|$: $|v_t|=\sqrt{1-\beta_2^t}|g|$
 
 ---
@@ -302,49 +312,80 @@ $$\theta_t=\theta_{t-1}-\alpha \frac{\sqrt{1-\beta_2^t}}{1-\beta_1^t} \frac{m_t}
 
 We can implement it in engineering:
 
-$\alpha_t = \alpha \frac{\sqrt{1-\beta_2^t}}{1-\beta_1^t}$
-
-$\theta_t=\theta_{t-1}-\alpha_t \frac{m_t}{\sqrt{v_t}+\epsilon}$
-
----
-
-## 1. From `SGD` to `AdamW`
-
-So far: It is the adjustment of SGD without regularization. What if we consider $L2$-regularization?
-
-$L_{total}(\theta)=L_{task}(\theta)+\frac{\lambda}{2}\|\theta\|_2^2$
-$\Rightarrow \theta=\theta-\alpha \nabla L_{task}(\theta)-\alpha \lambda \theta$
-
-The same to `AdamW`:
-
-$$\theta_t=\theta_{t-1}-\alpha \frac{\sqrt{1-\beta_2^t}}{1-\beta_1^t} \frac{m_t}{\sqrt{v_t}+\epsilon}-\alpha \lambda \theta$$
-$$=\theta_t=\theta_{t-1}-\alpha_t \frac{m_t}{\sqrt{v_t}+\epsilon}-\alpha \lambda \theta$$
+$$
+\begin{aligned}
+\alpha_t &= \alpha \frac{\sqrt{1-\beta_2^t}}{1-\beta_1^t} \\
+\theta_t &= \theta_{t-1}-\alpha_t \frac{m_t}{\sqrt{v_t}+\epsilon}
+\end{aligned}
+$$
 
 ---
 
 ## 1. From `SGD` to `AdamW`
 
-What the order of magnitude of scale of updating?
+It is the adjustment of SGD without regularization. 
+* What if we consider L2-regularization (weight decay)?
+* Recall: L2-regularization penalizes large weights to improve generalization.
 
-SGD:$|\alpha g_t|=\Theta(\alpha |g|)$
+$$
+\begin{aligned}
+\qquad& L_\text{total}(\theta) = L_\text{task}(\theta)+\frac{\lambda}{2}\|\theta\|_2^2 \\ 
+\implies& \theta=\theta-\alpha \nabla L_\text{total}(\theta) \\
+\implies& \theta=\theta-\alpha \nabla L_\text{task}(\theta)-\alpha \lambda \theta
+\end{aligned}
+$$
 
-AdamW: $|\alpha_t \frac{m_t}{\sqrt{v_t}+\epsilon}|=\Theta(\alpha_t \frac{\sum_{k=1}^t\beta_1^k|g|_{t-k}}{\sqrt{\sum_{k=1}^t\beta_2^k|g|^2_{t-k}}})$
+* However, the regularization complicates the adaptive method in `Adam` when we consider the gradient of $L_\text{total}$.  
+  * `Adam` scales gradients adaptively, L2 regularization is scaled as well, making the effective weight decay parameter-dependent instead of constant $\lambda$ .
+---
 
-When the training process enter the middle and late stages,
+## 1. From `SGD` to `AdamW`
 
-$\alpha_t \to \alpha$
-$|g|$ can be considered as a sequence with `mean`$=0$ and `variation`$=\sigma^2$ $\Rightarrow |g|\to \Theta(\sigma)$
+It is the adjustment of SGD without regularization. 
+* What if we consider L2-regularization (weight decay)?
+* However, the regularization complicates the adaptive method in `Adam`. 
+
+So in `AdamW`, we use decoupled weight decay:
+
+$$
+\begin{aligned}
+\theta_t &= \theta_{t-1}-\alpha \frac{\sqrt{1-\beta_2^t}}{1-\beta_1^t} \frac{m_t}{\sqrt{v_t}+\epsilon} {\color{blue} - \alpha \lambda \theta }\\ 
+&=\theta_{t-1}-\alpha_t \frac{m_t}{\sqrt{v_t}+\epsilon} {\color{blue} - \alpha \lambda \theta }
+\end{aligned}
+$$
 
 ---
 
 ## 1. From `SGD` to `AdamW`
 
-AdamW: $|\alpha_t \frac{m_t}{\sqrt{v_t}+\epsilon}|=\Theta(\alpha_t \frac{\sum_{k=1}^t\beta_1^k|g|_{t-k}}{\sqrt{\sum_{k=1}^t\beta_2^k|g|^2_{t-k}}})$
+What is the order of magnitude of the update scale?
 
-$|m_t|=\sum_{k=1}^t\beta_1^k|g|_{t-k}=\Theta(\sigma)$
-$|\sqrt{v_t}|=\sqrt{\sum_{k=1}^t\beta_2^k|g|^2_{t-k}}=\Theta(\sqrt{\sigma^2})=\Theta(\sigma)$
+Assumption: When the training process enters the middle and late stages, 
+* The gradient $|g|$ can be considered as a sequence with $\mathrm{Mean}=0$ and $\mathrm{Variation}=\sigma^2$ $\implies |g| \to \Theta(\sigma)$
+* The adaptive learning rate $\alpha_t \to \alpha$
 
-$|\alpha_t \frac{m_t}{\sqrt{v_t}+\epsilon}|=\Theta(\alpha)$, which is only related to base learning rate.
+<br>
+
+SGD:
+$$
+|\alpha g_t|=\Theta(\alpha \sigma)
+$$
+
+---
+
+## 1. From `SGD` to `AdamW`
+
+Suppose $|g| \to \Theta(\sigma), \alpha_t \to \alpha$, for AdamW:
+
+$$
+\begin{aligned}
+\left| \alpha_t \frac{m_t}{\sqrt{v_t}+\epsilon} \right| &= \Theta\left( \alpha_t \frac{\sum_{k=1}^t\beta_1^k|g|_{t-k}}{\sqrt{\sum_{k=1}^t\beta_2^k|g|^2_{t-k}}} \right) \\
+|m_t| &= \sum_{k=1}^t\beta_1^k|g|_{t-k}=\Theta(\sigma) \\
+|\sqrt{v_t}| &=\sqrt{\sum_{k=1}^t\beta_2^k|g|^2_{t-k}}=\Theta\left(\sqrt{\sigma^2}\right)=\Theta(\sigma)
+\end{aligned}
+$$
+
+Then $\left|\alpha_t \frac{m_t}{\sqrt{v_t}+\epsilon}\right|=\Theta(\alpha)$, which is only related to base learning rate.
 
 ---
 
@@ -353,7 +394,7 @@ $|\alpha_t \frac{m_t}{\sqrt{v_t}+\epsilon}|=\Theta(\alpha)$, which is only relat
 Any implementation of a custom optimizer inherits from the `torch.optim.Optimizer` base class. 
 The Optimizer base class provides two-level management for all model parameters:
 - `self.param_groups`: Group parameters. Each group can set different features like learning rate. (First-level management: parameter grouping, sharing states within the group)
-- Each `param_groups` contains at least the default key-value pair: "params", corresponding to a list of parameters. Other key-value pairs like "lr" can also be customized.
+- Each `param_groups` contains at least the default key-value pair: `"params"`, corresponding to a list of parameters. Other key-value pairs like `"lr"` can also be customized.
 - For each parameter in the parameter list, various states can also be set, e.g., iteration step `"step"`. (Second-level management: finer-grained states for individual parameters)
 
 ---
@@ -361,26 +402,31 @@ The Optimizer base class provides two-level management for all model parameters:
 ## 2. `torch.optim.Optimizer` Base Class
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
 
 ## 3. `class AdamW_Optimizer`
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 1; padding-right: 5px;">
+<div style="flex: 1;">
+
 <p align="center" style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
-    <img src="7.png" width=400>
+    <img src="pics/7.png" width=400>
 </p>
 
 </div>
 
-<div style="flex: 1.5; padding-left: 5px;">
+<div style="flex: 1.5;">
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 </div>
@@ -395,24 +441,25 @@ Code here
 
 ## 1. `class Cross_Entropy_Calculator`
 
-Review: What LLM done, and what's the meaning of it.
+Review: What the LLM does, and what it means.
 
-- Transformer output shape is `[bsz, seq_len, vocab_size]`. I.e., there are `(bsz*seq_len)` output predictions, each prediction is "the possibility score $s_i$ for each word at the next position" $(1\leq i \leq \text{bsz*seq\_len})$, same below.
-- Perform Softmax to get probability weight distribution $p_i$ of next word.
+- Transformer output shape is `[bsz, seq_len, vocab_size]`. There are `(bsz*seq_len)` output predictions, each prediction is "the probability score $s_i$ for each word at the next position".
+- Perform Softmax to get the probability distribution $p_i$ of the next word.
 
 <p align="center">
-    <img src="5.png" width=700>
+    <img src="pics/5.png" width=700>
 </p>
 
 ---
 
 ## 1. `class Cross_Entropy_Calculator`
 
-- Take $-\text{log}$ of the probability weight to get $l_i=-\text{log}(p_i)$, the mean of all $l_i$ is the **cross-entropy loss**.
-- That is: $\text{Loss}=\text{Mean}\{-l_i\}=\text{Mean}\{-\text{log} p_i\}=\text{Mean}\{-\text{log} \text{Softmax}(s_i)\}$
+- Take $-\text{log}$ of the probability weight to get $l_i=-\log(p_i)$
+- the mean of all $l_i$ is the **cross-entropy loss**.
+- $\text{Loss}=\text{Mean}\{-l_i\}=\text{Mean}\{-\log p_i\}=\text{Mean}\{-\log\operatorname{Softmax}(s_i)\}$
 
 <p align="center">
-    <img src="5.png" width=700>
+    <img src="pics/5.png" width=700>
 </p>
 
 ---
@@ -421,20 +468,25 @@ Review: What LLM done, and what's the meaning of it.
 
 **Numerical hazard: What if $p_i$ is too small and approximated as 0?** 
 * Suppose token1's 6-word weight scores are `100, -1, 1, 5, 2, 1000`, and the standard output is word2, with score `-1` and weight `0`.
-* Calculation result: $\text{log} 0=\text{NAN}$
+* Calculation result: $\log 0=\text{NAN}$
 
 Formula derivation: 
-
-$\text{log} \text{Softmax}(s_i)=\text{log} \frac{\exp(s_i)}{\sum{\exp{s_k}}}$ 
-$=\text{log} \frac{\exp(s_i-s_{max})}{\sum{\exp(s_k-s_{max})} }$ 
-$=(s_i-s_{max})-\text{log}(\sum{\exp(s_k-s_{max})})$
+$$
+\begin{aligned}
+\operatorname{logSoftmax}(s_i) &= \log \frac{\exp(s_i)}{\sum{\exp(s_k)}} \\ 
+&= \log \frac{\exp(s_i-s_\mathrm{max})}{\sum{\exp(s_k-s_\mathrm{max})} } \\ 
+&= (s_i-s_\mathrm{max}) - \log \left(\sum{\exp(s_k-s_\mathrm{max})}\right) 
+\end{aligned}
+$$
 
 ---
 
 ## 1. `class Cross_Entropy_Calculator`
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -442,21 +494,23 @@ Code here
 ## 1. `class Cross_Entropy_Calculator`
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
 
 ## 2. `class Gradient_Clipper`
 
-Suppose the gradient of parameter is too large?
+Suppose the gradient of a parameter is too large?
 
 * SGD: $|\alpha g_t|=\Theta(\alpha |g|)$. It may lead to failure of optimization.
-* AdamW: $|\alpha_t \frac{m_t}{\sqrt{v_t}+\epsilon}|=\Theta(\alpha)$. It seems no problem?
+* AdamW: $\left|\alpha_t \frac{m_t}{\sqrt{v_t}+\epsilon}\right|=\Theta(\alpha)$. It seems like there is no problem?
 
 Review: $v_t$ of AdamW: $v_t=(1-\beta_2)\sum_{\tau=1}^t{\beta_2^{t-\tau}g_{\tau}^2}$
 
-* $v_t$ becomes extremly large during next hundreds of steps
+* $v_t$ becomes extremely large over the next hundreds of steps.
 * $\alpha_t \frac{m_t}{\sqrt{v_t}+\epsilon} \to 0$, which means the optimization stops abnormally.
 
 So when the gradient is too large, we need to scale it to a small enough level.
@@ -465,8 +519,8 @@ So when the gradient is too large, we need to scale it to a small enough level.
 
 ## 2. `class Gradient_Clipper`
 
-Suppose all parameters of a model come from 5 Linear_Transform (5D to 5D), then the model has 5 parameter tensors (all 5*5 shape). 
-After one round of backpropagation, suppose gradient of all 5 parameters are equal to:
+Suppose all parameters of a model come from 5 Linear_Transform (5D to 5D), then the model has 5 parameter tensors (all of $5\times 5$ shape). 
+After one round of backpropagation, suppose the gradients of all 5 parameters are equal to:
 
 ```
 tensor([[1., 1., 1., 1., 1.],
@@ -485,7 +539,7 @@ So the grad norm is $\sqrt{\sum_{i=1}^5{\|\nabla p_i\|_2^2}}=\sqrt{125}=11.18$
 ## 2. `class Gradient_Clipper`
 
 - Assuming the acceptable upper limit is `max_norm`=$0.01$:
-- All parameters must be multiplied by the scaling factor $\frac{\text{max\_norm}}{g+\epsilon}$ to ensure the total L2 norm size of gradients is reasonable.
+- All parameters must be multiplied by the scaling factor $\frac{\text{max\_norm}}{g+\epsilon}$ to ensure the total L2 norm of the gradients remains within a reasonable range.
 - After clipping, the gradients of each parameter are $11.18/0.01$ times smaller:
 
 ```
@@ -501,7 +555,9 @@ tensor([[0.0009, 0.0009, 0.0009, 0.0009, 0.0009],
 ## 2. `class Gradient_Clipper`
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -511,7 +567,7 @@ Code here
 Throughout the model training process, the learning rate is not constant:
 
 <p align="center">
-    <img src="9.png" width=800>
+    <img src="pics/9.png" width=800>
 </p>
 
 ---
@@ -519,7 +575,9 @@ Throughout the model training process, the learning rate is not constant:
 ## 3. `class Learning_Rate_Scheduler`
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -530,13 +588,13 @@ Code here
 
 ## A hidden problem
 
-Usually we need hours even days to train a large model……
+Usually we need hours or even days to train a large model...
 
 Can we ensure there's nothing wrong during the whole process?
 
 * For example, the computing power resource you applied for has been preempted, and everything crashed immediately.
 
-To reduce the problem, we try to save to model every once in a while.
+To address this issue, we try to save the model every once in a while.
 
 This is `checkpoint`.
 
@@ -545,10 +603,10 @@ This is `checkpoint`.
 ## What to save and load?
 
 * Model parameters
-* Optimizer parameters (such as $m_t$ amd $v_t$)
-* Step now
+* Optimizer parameters and states (such as $m_t$ and $v_t$)
+* Current iteration step
 
-We need to get them first, and try to save them as files in the disk.
+We need to get them first, and try to save them as files on disk.
 
 ---
 
@@ -556,9 +614,9 @@ We need to get them first, and try to save them as files in the disk.
 
 - PyTorch has a built-in `state_dict()` function that stores all parameters of the PyTorch module in dictionary form.
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 1; padding-right: 5px;">
+<div style="flex: 1;">
 
 ```Python
 lm = Transformer_LM(
@@ -580,7 +638,7 @@ for state_key in states:
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
 ```Python
 transformer_blocks.0.RMSNorm_Attn.g torch.Size([512])
@@ -621,7 +679,7 @@ final_layer.linear_matrix torch.Size([512, 10000])
 * Prerequisite: Both must match completely!
 
 <p align="center">
-    <img src="10.png" width=400>
+    <img src="pics/10.png" width=400>
 </p>
 
 ---
@@ -631,7 +689,9 @@ final_layer.linear_matrix torch.Size([512, 10000])
 - Objects to store: Model parameters, optimizer parameters, current iteration step.
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -641,7 +701,9 @@ Code here
 - Objects to load: Model parameters, optimizer parameters, current iteration step.
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -653,32 +715,32 @@ Code here
 ## To This Point...
 
 We have sorted out:
-- The architecture and parameters to pass of each model module.
-- The implementation and parameters to pass of each training module.
+- The architecture of each model module and its required parameters.
+- The implementation of each training module and its required parameters.
 
 Regarding passing parameters...
 
-How do we specify the specific values of these parameters, **effectively** modify and pass certain values to each module?
+How do we determine the specific values of these parameters, then **effectively** modify and pass them to each module?
 
 ---
 
 ## 1. Starting Training Scripts
 
 - We can directly assign values to various parameters in the training script.
-- When the training script is very complex, various functional modules will be ambiguous.
+- When the training script is very complex, the various functional modules may become hard to keep track of. 
 - We usually use a `bash` script to carry the required parameter values and start the execution of the `python` training script.
 
 <p align="center">
-    <img src="11.png" width=300>
+    <img src="pics/11.png" width=300>
 </p>
 
 ---
 
 ## 1. Starting Training Scripts
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 1.6; padding-right: 5px;">
+<div style="flex: 1.6;">
 
 ```bash
 #!/bin/bash
@@ -713,10 +775,10 @@ python /home/kuangph/CS336-Assignment1/cs336_basics/run_clm.py \
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
-* It is equal to enter a long command line in the terminal, containing information we need
-* For `run_clm.py`, we need to properly decode information of command line.
+* It is equivalent to entering a long command line in the terminal, containing information we need
+* For `run_clm.py`, we need to properly parse the command-line arguments.
 
 </div>
 
@@ -726,9 +788,9 @@ python /home/kuangph/CS336-Assignment1/cs336_basics/run_clm.py \
 
 ## 2. Parameter Decoding
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 1; padding-right: 5px;">
+<div style="flex: 1;">
 
 ```Python
 def parse_bash_args():
@@ -755,7 +817,7 @@ def parse_bash_args():
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
 ```Python
 parser.add_argument("--chunk_size",type=int,default=500000)
@@ -788,20 +850,24 @@ return args
 
 ## 2. Parameter Decoding
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 1; padding-right: 5px;">
+<div style="flex: 1;">
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 </div>
@@ -816,7 +882,7 @@ Code here
 
 ## Review of Model Training Process
 
-- Receive parameters, establish model and training modules.
+- Receive parameters, set up the model and training modules.
 - Determine the total number of iterative optimization steps.
 - For each step:
   - Sample data.
@@ -825,18 +891,12 @@ Code here
   - Calculate gradients and clip.
   - Schedule the learning rate.
   - Update parameters.
-- It is recommended to output real-time status during the process, such as the current loss function value, current text prediction situation, etc.
+- It is recommended to output real-time status during the process, such as the current loss function value, current text prediction results, etc.
 
 ---
 
-<style scoped>
-section * {
-  font-size: 1.1em !important;
-}
-</style>
-
-<p align="center">
-    <strong>Code Explanation</strong>
+<p align="center" style="font-size: 1.5em;">
+<strong> Code Explanation </strong>
 </p>
 
 ---
@@ -850,7 +910,7 @@ section * {
 During training, fixed-length text is often sampled as input to the model. However, the total length of decoded text may be unpredictable.
 
 <p align="center">
-    <img src="12.png" width=800>
+    <img src="pics/12.png" width=800>
 </p>
 
 ---
@@ -861,7 +921,7 @@ During training, fixed-length text is often sampled as input to the model. Howev
 * During decoding, we only care about "what is the next word?"!
 
 <p align="center">
-    <img src="13.png" width=800>
+    <img src="pics/13.png" width=800>
 </p>
 
 ---
@@ -878,14 +938,14 @@ After receiving vocab scores:
 
 ## Autoregressive
 
-The sampled output this step is a part of input next step.
+The sampled output of this step is part of the input for the next step.
 
 <p align="center">
-    <img src="14.png" width=800>
+    <img src="pics/14.png" width=800>
 </p>
 
 ---
 
-<p align="center">
-    <strong>Code Explanation and Practical Demonstration</strong>
+<p align="center" style="font-size: 1.5em;">
+<strong>Code Explanation and Practical Demonstration</strong>
 </p>
