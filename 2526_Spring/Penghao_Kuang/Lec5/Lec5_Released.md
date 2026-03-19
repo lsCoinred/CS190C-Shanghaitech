@@ -2,7 +2,7 @@
 marp: true
 theme: default
 paginate: true
-math: true
+math: katex
 style: |
     section {
         background: linear-gradient(
@@ -21,13 +21,11 @@ Build Transformer Decoder
 
 ---
 
-<style scoped>
-section {
-  font-size: 2.5em;
-}
-</style>
+<div style="font-size: 1.5em;">
 
-**Attention please**: These slides delete and only delete code implementation of all modules.
+**Attention please**: The only content removed from these slides is the code implementation of each module.
+
+</div>
 
 ---
 
@@ -45,32 +43,32 @@ section {
 
 ---
 
-## Transformer Overall Architecture Diagram
+## Decoder-Only Transformer Overall Architecture Diagram
 
 <p align="center">
-    <img src="1.png" width="800">
+    <img src="pics/1.png" width="800">
 </p>
 
 ---
 
 ## Modules of the whole Transformer
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px;">
 
-<div style="flex: 1; padding-right: 5px;">
+<div style="flex: 1;">
 
 <p align="center">
-    <img src="2.png" width=400>
+    <img src="pics/2.png" width=400>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
-* Pass through a `Token Embedding` module to turn to dense vector (Input layer)
+* Pass through a `Token Embedding` module to convert to a dense vector (Input layer)
 * Pass through several `Transformer Block` modules to absorb information in multiple rounds (Hidden layer)
-* Normalize the number scale of final tensor
-* Linear transform, calculate possible scores for generating of each word (Output layer)
+* Normalize the numerical scale of the final tensor
+* Apply a linear transformation to calculate possible scores for generating each word (Output layer)
 
 </div>
 
@@ -80,22 +78,22 @@ section {
 
 ## Modules of each Transformer Block
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px;">
 
-<div style="flex: 1; padding-right: 5px;">
+<div style="flex: 1;">
 
 <p align="center">
-    <img src="3.png" width=310>
+    <img src="pics/3.png" width=310>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
 * Pre-layer RMSNorm module
 * MHA Module with Residual Connection
-  * contains RoPE module if position embedding needed
-  * contains Softmax module for calculation of attention score
+  * contains a RoPE module if positional embedding is needed
+  * contains a Softmax module for computing the attention score
 * Pre-layer RMSNorm module
 * FFN Module with Residual Connection
   * contains SiLU module
@@ -104,7 +102,7 @@ section {
 
 </div>
 
-Moreover, almost all modules require calling the **linear transformation** module!
+Moreover, almost all modules require using the **linear transformation** module!
 
 ---
 
@@ -114,32 +112,25 @@ Moreover, almost all modules require calling the **linear transformation** modul
 
 ## Basic Components to be Implemented
 
-<div style="display: flex;">
-<div style="flex: 1.5; padding-right: 5px;">
+<div style="display: flex; gap: 20px;">
+<div style="flex: 1.5;">
 
 <p align="center">
-    <img src="1.png" width=900>
+    <img src="pics/1.png" width=900>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
-<p align="center">
-<div style="display: flex; flex-direction: column; justify-content: center; height: 80%;">
-    <div>
-        <b>Modules to be implemented:</b>
-        <ul>
-            <li><code>Token Embedding</code></li>
-            <li><code>Linear</code></li>
-            <li><code>RMSNorm</code></li>
-            <li><code>SiLU</code></li>
-            <li><code>Softmax</code></li>
-        </ul>
-    </div>
-</div>
-</p>
+<br>
 
+**Modules to be implemented**:
+* `Token Embedding`
+* `Linear`
+* `RMSNorm`
+* `SiLU`
+* `Softmax`
 
 </div>
 
@@ -147,23 +138,21 @@ Moreover, almost all modules require calling the **linear transformation** modul
 
 ---
 
-<style scoped>
-section {
-  font-size: 1.9em;
-}
-</style>
-
 ## 1. `class Generate_Embeddings`
+
+<div style="font-size: 0.88em;">
 
 IDEA:
 - Most original input: BPE encoding results (e.g., `[3,10,2,6,4]`, all token IDs from the vocabulary)
 - Tensor shape: `[batch_size, seq_len]`
-- Expected model input: Different words in the vocabulary have different embedding vectors $\text{emb}_i \in R^{d\_model}$
+- Expected model input: Different words in the vocabulary have different embedding vectors $\text{emb}_i \in \mathbb{R}^{d_\text{model}}$
 - Implementation idea: 
-  * Generate a learnable matrix $W_e \in R^{|V|*d\_model}$.
+  * Generate a learnable matrix $W_e \in \mathbb{R}^{|V|\times d_\text{model}}$.
   * The $i$-th column represents $\text{emb}_i$
   * Randomly initialized $W_e$, representing no prior knowledge about the meaning of any word at first.
   * Learn $W_e$ with other parameters during the training process.
+
+</div>
 
 ---
 
@@ -180,7 +169,9 @@ Parameter scheme:
 ## 1. `class Generate_Embeddings`
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -189,34 +180,41 @@ Code here
 
 IDEA:
 - Assume we need to transform a 3-dimensional tensor into a 6-dimensional one...
-- Mathematically speaking: Let the 3D tensor `x` ($1*3$) right-multiply a $3*6$ matrix `W`
-- The shape of `xW` is then $1*6$, just like the diagram below.
+- Mathematically speaking: Let the 3D tensor `x` ($1\times 3$) right-multiply a $3\times 6$ matrix `W`
+- The shape of `xW` is then $1\times 6$, just like the diagram below.
 
 <p align="center">
-    <img src="4.png" width=400>
+    <img src="pics/4.png" width=400>
 </p>
 
-Question: Linear operations are the most frequent in LLMs……
+Question: Linear operations are the most frequent in LLMs...
 
 **Can this operation be accelerated as much as possible?**
 
 ---
 
-<style scoped>
-section {
-  font-size: 2em;
-}
-</style>
-
 ## 2. `class Linear_Transform`
 
 - PyTorch tensors follow the "last dimension elements have contiguous memory addresses" principle.
-- For a $3*6$ tensor W, its memory layout as the diagram(same color means contiguous):
+
+<div style="display: flex; gap: 20px;">
+<div style="flex: 1;">
+
+- For a $3\times 6$ tensor W, its memory layout is shown in the diagram (same color means contiguous):
+
+</div>
+
+<div style="flex: 0.5;">
+
 <p align="center">
-    <img src="5.png" width=200>
+    <img src="pics/5.png" width=220>
 </p>
 
-- For a $4*3*6$ tensor (`[batch size, rows, columns]`), every 6 elements are also contiguous (e.g., the memory address difference between `[1,1,1]` and `[1,1,2]` is 1 units, and the memory address difference between `[1,1,1]` and `[1,2,1]` is 6 units).
+</div>
+
+</div>
+
+- For a $4\times 3\times 6$ tensor (`[batch size, rows, columns]`), every 6 elements are also contiguous (e.g., the memory address difference between `[1,1,1]` and `[1,1,2]` is 1 unit, while the difference between `[1,1,1]` and `[1,2,1]` is 6 units).
 - That is: Matrix elements in the same row have contiguous memory, while those in the same column do not $\Rightarrow$ **Row-major order principle**.
 
 ---
@@ -224,7 +222,7 @@ section {
 ## 2. `class Linear_Transform`
 
 <p align="center">
-    <img src="4.png" width=400>
+    <img src="pics/4.png" width=400>
 </p>
 
 Perform 6 vector dot product operations. In each operation:
@@ -238,10 +236,10 @@ How can we make `W` also participate "as a whole row" in each operation?
 ## 2. `class Linear_Transform`
 
 <p align="center">
-    <img src="6.png" width=400>
+    <img src="pics/6.png" width=400>
 </p>
 
-- PyTorch's transpose operation does not change the tensor's underlying memory space, just change stepsize. (Can you give an example?)
+- PyTorch's transpose operation does not change the tensor's underlying memory layout, only the step size (Can you give an example?)
 - Create new `W`: `[6,3]` (every 3 elements are contiguous in memory)
 - Transpose `W` to `[3,6]`: Can perform matrix multiplication, and the memory distribution remains unchanged
 - `x` and `W` have fully contiguous memory access during each operation, allowing full utilization of cache!
@@ -251,64 +249,64 @@ How can we make `W` also participate "as a whole row" in each operation?
 ## 2. `class Linear_Transform`
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
 
-<style scoped>
-section {
-  font-size: 2em;
-}
-</style>
-
 ## 3. `class RMSNorm`
 
-IDEA: Normalize the input tensor $\vec{a}$ (We've discussed why at `Lec3`)
-- $a_i=\frac{a_i}{RMS(\vec{a})}g_i$ (divide by normalization weight uniformly, and apply learnable fine-tuning)
+<div style="font-size: 0.9em;">
+
+IDEA: Normalize the input tensor $\mathbf{a}$ (We've discussed why at `Lec3`)
+- $\mathbf{a}_i=\frac{\mathbf{a}_i}{\mathrm{RMS}(\mathbf{a})}g_i$ (divide by normalization weight uniformly, and apply learnable fine-tuning)
 - $g_i$ is a learnable parameter
-- $RMS(\vec{a})=\sqrt{(\frac{1}{d_{model}}\sum{a_i^2})+\epsilon}$, that is L2-Norm.
+- $\mathrm{RMS}(\mathbf{a})=\sqrt{(\frac{1}{d_{model}}\sum{\mathbf{a}_i^2})+\epsilon} \quad\text{(Root Mean Square)}$ 
 
 Input tensor shape: `[batch_size, seq_len, d_model]` $\Rightarrow$ Not a 1D vector, how to handle? 
-**PyTorch's broadcasting mechanism**: 
-* Operations are performed on the last few dimensions by default, previous dimensions are all replication operations
-* Equivalent to parallel operations on `batch_size * seq_len` parallel `d_model`-dimensional tensors.
-* Just process it as 1D vector `[d_model]`!
+* **PyTorch's broadcasting mechanism**: 
+  * By default, operations are performed on the last few dimensions, while operations across earlier dimensions are equivalent to replication.
+  * Equivalent to parallel operations on `batch_size * seq_len` parallel `d_model`-dimensional tensors.
+  * Just process it as a 1D vector `[d_model]`!
+
+</div>
 
 ---
 
-<style scoped>
-section {
-  font-size: 2.1em;
-}
-</style>
-
 ## 3. `class RMSNorm`
 
+<div style="font-size: 0.95em;">
+
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
+
+</div>
 
 ---
 
 ## 4. `class SiLU_Activation`
 
-<div style="display: flex;">
+<div style="display: flex; gap: 15px">
 
-<div style="flex: 1; padding-right: 5px;">
+<div style="flex: 1;">
 
 <p align="center">
-    <img src="7.png" width=400>
+    <img src="pics/7.png" width=400>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
 $\text{SiLU:} f(x)=x·\sigma(x)$
 $\text{ReLU:} f(x)=\text{max}(0,x)$
 
-* For $x<0$: roughly equals to 0
+* For $x<0$: roughly equals to $0$
 * For $x>0$: roughly stays the same
 * Compare with ReLU: smooth and differentiable at $x=0$
 
@@ -321,7 +319,9 @@ $\text{ReLU:} f(x)=\text{max}(0,x)$
 ## 4. `class SiLU_Activation`
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -329,7 +329,7 @@ Code here
 ## 5. `class Softmax_Activation`
 
 How to turn a score tensor to a distribution?
-$$x_i=\frac{e^{x_i}}{\sum{e^{x_i}}}$$
+$$x_i=\frac{e^{x_i}}{\sum{e^{x_j}}}$$
 - Each $x_i$ calculates its exponential as a weight, then performs weight normalization
 - Can make the advantage of relatively larger values more pronounced
 - Even smaller values remain non-zero after normalization
@@ -342,27 +342,34 @@ Problem: What if there exists a very large $x_i$? (e.g., normalizing `[20,3,1005
 ## 5. `class Softmax_Activation`
 
 - Normalizing `[100,101,102]` vs Normalizing `[-2,-1,0]`
-- Weight of 102: $\frac{e^{102}}{e^{102}+e^{101}+e^{100}}$ = $\frac{e^{0}}{e^{0}+e^{-1}+e^{-2}}$
+- Weight of 102: 
+  $$\frac{e^{102}}{e^{102}+e^{101}+e^{100}} = \frac{e^{0}}{e^{0}+e^{-1}+e^{-2}}$$
 - The Softmax normalization result of `[100,101,102]` is equivalent to that of `[-2,-1,0]`
 
-Let $x_{max}$ be the maximum value among $x_i$: 
+---
 
-<p align="center">
+## 5. `class Softmax_Activation`
 
-$\text{Softmax}(x_i)=\frac{e^{x_i}}{\sum{e^{x_i}}}$  
-$=\frac{e^{x_i}/e^{x_{max}}}{\sum{e^{x_i}}/e^{x_{max}}}$  
-$=\frac{e^{x_{i}-x_{max}}}{\sum{e^{x_i-x_{max}}}}$
+Let $x_\mathrm{max}$ be the maximum value among $x_i$: 
 
-</p>
+$$
+\begin{aligned}
+\mathrm{Softmax}(x_i) &= \frac{e^{x_i}}{\sum{e^{x_j}}} \\
+    &= \frac{e^{x_i}/e^{x_\mathrm{max}}}{\sum{e^{x_j}}/e^{x_\mathrm{max}}} \\
+    &= \frac{e^{x_{i}-x_\mathrm{max}}}{\sum{e^{x_j-x_\mathrm{max}}}}
+\end{aligned}
+$$
 
-That is: subtract $x_{max}$ from all $x_i$ to avoid problems with extremely large values that cannot be calculated!
+**Safe Softmax**: Subtract $x_\mathrm{max}$ from all $x_i$ to avoid problems with extremely large values that cannot be calculated!
 
 ---
 
 ## 5. `class Softmax_Activation`
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -373,136 +380,128 @@ Code here
 
 ## Review: RoPE Calculation Rules
 
-$\vec{x} \Rightarrow R_i\vec{x}$ ($\vec{x} \in R^d$,$d$ is even)
-
-Divide the d-dimensional vector into several sub-segments of length 2, resulting in a total of $d/2$ sub-segments, each sub-segment makes a rotation of angle $\theta_{i,k}$ . (Proportional to position $i$)
-
+Apply the rotation: $\bm{x} \mapsto \bm{R}^i\bm{x}$.
+* Given an embedding $\bm{x} \in \mathbb{R}^d$ (where $d$ is even) at position $i$:
+* Divide the $d$-dimensional vector into $d/2$ pairs (2D sub-spaces).
+* Rotate each pair by an angle $\theta_{i,k}$.
 $$
-R^i = 
+\bm{R}^i =
 \begin{bmatrix}
-R^i_1 & 0 & 0 & \cdots & 0 \\
-0 & R^i_2 & 0 & \cdots & 0 \\
-0 & 0 & R^i_3 & \cdots & 0 \\
+\bm{R}^i_1 & 0 & 0 & \cdots & 0 \\
+0 & \bm{R}^i_2 & 0 & \cdots & 0 \\
+0 & 0 & \bm{R}^i_3 & \cdots & 0 \\
 \vdots & \vdots & \vdots & \ddots & \vdots \\
-0 & 0 & 0 & \cdots & R^i_{d/2}
-\end{bmatrix}
-\quad
-R^i_k = 
+0 & 0 & 0 & \cdots & \bm{R}^i_{d/2}
+\end{bmatrix},
+\quad \text{where}
+\begin{cases}
+\bm{R}^i_k =
 \begin{bmatrix}
 \cos(\theta_{i,k}) & -\sin(\theta_{i,k}) \\
 \sin(\theta_{i,k}) & \cos(\theta_{i,k})
-\end{bmatrix}.
+\end{bmatrix}, \\
+\theta_{i,k} = \dfrac{i}{\Theta^{2k/d}} .
+\end{cases}
 $$
 
-where  $\theta_{i,k} = \frac{i}{\Theta^{2k/d}}$ 
-
 ---
-
-<style scoped>
-section {
-  font-size: 1.9em;
-}
-</style>
 
 ## Review: RoPE Calculation Rules
 
 $$
-R^i = 
-\begin{bmatrix}
-R^i_1 & 0 & 0 & \cdots & 0 \\
-0 & R^i_2 & 0 & \cdots & 0 \\
-0 & 0 & R^i_3 & \cdots & 0 \\
-\vdots & \vdots & \vdots & \ddots & \vdots \\
-0 & 0 & 0 & \cdots & R^i_{d/2}
-\end{bmatrix}
-\quad
-R^i_k = 
+\bm{R}^i =
+\mathrm{diag}\left(\bm{R}^i_1, \bm{R}^i_2, \dots, \bm{R}^i_{d/2} \right),
+\text{where }
+\bm{R}^i_k =
 \begin{bmatrix}
 \cos(\theta_{i,k}) & -\sin(\theta_{i,k}) \\
 \sin(\theta_{i,k}) & \cos(\theta_{i,k})
-\end{bmatrix}.
+\end{bmatrix},
 $$
 
-Property of matrix  $R$ :  $(R^{m})^TR^n = R^{n-m}$ 
+The attention score with RoPE depends only on relative position.
 
-In the attention mechanism, for the query vector  $q_i$  at position  $i$  and the key vector  $k_j$  at position  $j$ :
-* $q'_i = R^i q_i,\ k'_j = R^j k_j$
-* $q'^T_i k'_j = q_i^T (R^{i})^T R^j k_j = q_i^T R^{j-i} k_j$
+* Property of rotation matrix $\bm{R}$: $\bm{R}^m(\bm{R}^n)^T = \bm{R}^{m-n}$
+  * Transpose = inverse, Multiplication → Addition of powers. 
 
-The transformation caused by position, is only related to relative position.
+* In attention mechanism, given a query $\bm{q}_i$ at position $i$ and a key $\bm{k}_j$ at position $j$:
+  $$\bm{q}'_i = \bm{R}^i\bm{q}_i, \quad \bm{k}'_j = \bm{R}^j\bm{k}_j$$
+  $$(\bm{q}'_i)^T \bm{k}'_j = \bm{q}_i^T (\bm{R}^i)^T \bm{R}^j \bm{k}_j = \bm{q}_i^T \bm{R}^{j-i} \bm{k}_j$$
+
+</div>
 
 ---
 
 ## How to Avoid Brute-force Matrix Multiplication?
 
 * Observation: Even rows of the matrix correspond to the same transformation rule: `[cos, -sin]`, with angle $\theta_{i,k}$ as the variable
-* If these even rows sharing the same rule can be computed efficiently in a unified manner, how should subsequent processing proceed?
+* If these even rows that share the same rule can be computed efficiently in a unified manner, how should subsequent processing proceed?
 <p align="center">
-<img src="12.png" width=280><img src="8.png" width=280><img src="13.png" width=280><img src="9.png" width="280">
+    <img src="pics/12.png" width=275>
+    <img src="pics/8.png" width=270>
+    <img src="pics/13.png" width=280>
+    <img src="pics/9.png" width=270>
 </p>
 
 ---
-
-<style scoped>
-section {
-  font-size: 2.1em;
-}
-</style>
 
 ## How to Avoid Brute-force Matrix Multiplication?
 
-- Calculate products of `Red-Red`, `Yellow-Yellow`, `Blue-Blue`, which coreespond to:$x_0$, $x_2$, $x_4$ after RoPE
-* $x_1$, $x_3$, $x_5$ are the same.
-* Calculate each 2-number blocks, and calculate products.
+- Calculate products of `Red-Red`, `Yellow-Yellow`, `Blue-Blue`, 
+  - which correspond to: $x_0, x_2, x_4$ after RoPE
+- The same applies to $x_1, x_3, x_5$.
+- Construct 2-number blocks of $\bm{R}_i$, and calculate block-wise dot products.
 
 <p align="center">
-<img src="9.png" width="380">
+<img src="pics/9.png" width="380">
 </p>
 
 ---
 
-## How to Calculate 2-number blocks of $R_i$?
+## How to Construct 2-number blocks of $\bm{R}_i$?
 
 - Pre-calculate a $\theta_{i,k}$ lookup table of size `[max_seq_len, d/2]`
-- Then calculate lookup tables of the same size for $cos(\theta_{i,k})$ and $sin(\theta_{i,k})$
+- Then calculate lookup tables of the same size for $\cos(\theta_{i,k})$ and $\sin(\theta_{i,k})$
 - Obtain values at positions 1, 3, 5 directly from the cos lookup table
 - Obtain values at positions 2, 4, 6 directly from the sin lookup table
 
 <p align="center">
-<img src="10.png" width="380">
+<img src="pics/10.png" width="380">
 </p>
 
 ---
 
-## How to Calculate 2-number blocks of $R_i$?
+## How to Construct 2-number blocks of $\bm{R}_i$?
 
-- Concatenate pairs 12, 34, 56 into 3 blocks, perform block-wise dot product with the 3 blocks of `x`, obtaining the values for the three even rows.
+- Concatenate pairs `(1,2)`, `(3,4)`, `(5,6)` into 3 blocks, perform block-wise dot product with the 3 blocks of `x`, obtaining the values for the three even rows.
 - Similarly, obtain the values for all odd rows of the transformed `x`, concatenate both to get the complete transformed `x` vector.
 
 <p align="center">
-<img src="11.png" width="380">
+<img src="pics/11.png" width="380">
 </p>
 
 ---
 
-<style scoped>
-section {
-  font-size: 1.8em;
-}
-</style>
-
 ## Code Implementation of RoPE
 
+<div style="font-size: 0.75em;">
+
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
+
+</div>
 
 ---
 
 ## Code Implementation of RoPE
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -516,18 +515,21 @@ Code here
 Module algorithm (excluding residual connection):
 - Input tensor `x` (`d_model` dimensional)
 - Route 1: Transform via `W1` to `d_ff` dimensional, pass through `SiLU` activation function to get new `x`
-- Route 2: Transform via `W3` for another expansion, getting gated `d_ff` dimensional
-- Element-wise multiplication of `x` and gated, getting new `x`
+- Route 2: Transform via `W3` for another expansion, obtaining another `d_ff`-dimensional tensor
+- Perform element-wise multiplication of two tensors to obtain a new `x`
 - Transform back to `d_model` dimensional via `W2`
 
-We call it `SwiGLU`:$\text{FFN}(x)=\text{SwiGLU}(x,W_1,W_2,W_3)$
+We call it `SwiGLU`: 
+$$\mathrm{FFN}(x)=\mathrm{SwiGLU}(x,W_1,W_2,W_3)$$
 
 ---
 
 ## 1. `class Feed_Forward_Network`
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -535,7 +537,9 @@ Code here
 ## 1. `class Feed_Forward_Network`
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -544,7 +548,7 @@ Code here
 
 Module algorithm (excluding residual connection):
 - Input tensor `x` with size `[batch_size, seq_len, d_model]`
-- Through three linear transformations, essentially linearly transforming each d_model dimensional word vector of x to get:
+- Through three linear transformations, each `d_model`-dimensional word vector of `x` is projected to obtain:
   - `Q`, `K` matrices `[batch_size, seq_len, num_heads*d_k]`
   - `V` matrix `[batch_size, seq_len, num_heads*d_v]`
 - Perform `RoPE` positional encoding on `Q`, `K` matrices
@@ -558,34 +562,36 @@ Module algorithm (excluding residual connection):
 Method for calculating attention output:
 - Multiply `Q`, `K` matrices to calculate token feature matching scores
 - Apply mask processing to the matching score matrix
-- $\text{Softmax}(\frac{QK^T}{\sqrt{d_k}})$, calculate attention scores between tokens
+- $\mathrm{Softmax}(\frac{QK^T}{\sqrt{d_k}})$, calculate attention scores between tokens
 - Multiply the score matrix by the `V` matrix to get the attention output of each head
-* Multiply `W_O` matrix to integrate heads
+- Multiply by the `W_O` matrix to integrate the heads
 
 ---
 
 ## Calculation of Attention Output for One Head
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
 
-<style scoped>
-section {
-  font-size: 1.9em;
-}
-</style>
-
 ## Generation of Attention Mask
 
+<div style="font-size: 0.75em;">
+
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
+</div>
+
 <p align="center">
-    <img src="14.png" width=210 style="margin-right: 6em;"> <img src="15.png" width=200>
+    <img src="pics/14.png" width=210 style="margin-right: 6em;"> <img src="pics/15.png" width=200>
 </p>
 
 ---
@@ -593,22 +599,32 @@ Code here
 ## List of Sub-modules in Multihead_Attention
 
 - Attention mask generation module
-- Attention output calculation module (sdpa)
-- RoPE module $\Rightarrow$ Requires additional parameters like max_seq_len, theta, token_positions, etc.
-- Four types of linear transformations: Q, K, V, O
+- Attention output calculation module (SDPA)
+- RoPE module $\Rightarrow$ Requires additional parameters like `max_seq_len`, `theta`, `token_positions`, etc.
+- Four types of linear transformations: `Q`, `K`, `V`, `O`
 
 ---
 
-<style scoped>
-section {
-  font-size: 1.9em;
-}
-</style>
+## Assembly of Complete Module
+
+<div style="font-size: 0.8em;">
+
+```Python
+
+[CODE EXPUNGED]
+
+```
+
+</div>
+
+---
 
 ## Assembly of Complete Module
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -616,15 +632,9 @@ Code here
 ## Assembly of Complete Module
 
 ```Python
-Code here
-```
 
----
+[CODE EXPUNGED]
 
-## Assembly of Complete Module
-
-```Python
-Code here
 ```
 
 ---
@@ -635,26 +645,26 @@ Code here
 
 ## Structure of Transformer Block
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 1; padding-right: 5px;">
+<div style="flex: 1;">
 
 <p align="center">
-    <img src="3.png" width=350>
+    <img src="pics/3.png" width=350>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
-* A RMSNorm module
-* A MHA module
+* An RMSNorm module
+* An MHA module
 * Residual connection
-* An other RMSNorm module
-* A FFN module
+* Another RMSNorm module
+* An FFN module
 * Residual connection
 
-The parameters received by each Block are the union of all parameters required by the above modules!
+The parameters received by each Block consist of all parameters required by the modules listed above!
 </div>
 
 </div>
@@ -664,7 +674,9 @@ The parameters received by each Block are the union of all parameters required b
 ## Assembly of Transformer Block
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
@@ -672,29 +684,33 @@ Code here
 ## Assembly of Transformer Block
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 ---
 
 ## Structure of Full Transformer
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 1; padding-right: 5px;">
+<div style="flex: 1;">
 
 <p align="center">
-    <img src="2.png" width=350>
+    <img src="pics/2.png" width=400>
 </p>
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
+
+<br><br>
 
 * A Token Embedding module
 * Several Transformer Block modules
 * A RMSNorm module
-* Final Linear Transformation module
+* The Final Linear Transformation module
 
 </div>
 
@@ -704,20 +720,24 @@ Code here
 
 ## Assembly of Complete Transformer
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 1; padding-right: 5px;">
+<div style="flex: 1;">
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```
 
 </div>
@@ -729,5 +749,7 @@ Code here
 ## Assembly of Complete Transformer
 
 ```Python
-Code here
+
+[CODE EXPUNGED]
+
 ```

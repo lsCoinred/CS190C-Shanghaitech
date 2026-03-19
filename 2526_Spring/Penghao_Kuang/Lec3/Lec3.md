@@ -214,7 +214,7 @@ In this course, we will focus primarily on **Decoder-only models**, as they are 
 ## RoPE: Rotary Position Embedding
 
 Apply the rotation: $\bm{x} \mapsto \bm{R}^i\bm{x}$.
-* Given a embedding $\bm{x} \in \mathbb{R}^d$ (where $d$ is even) at position $i$:
+* Given an embedding $\bm{x} \in \mathbb{R}^d$ (where $d$ is even) at position $i$:
 * Divide the $d$-dimensional vector into $d/2$ pairs (2D sub-spaces).
 * Rotate each pair by an angle $\theta_{i,k}$.
 $$
@@ -1008,9 +1008,9 @@ $$
 
 ## Summary of Transformer architecture and modules
 
-<div style="display: flex;">
+<div style="display: flex; gap: 10px">
 
-<div style="flex: 1.8; padding-right: 5px;">
+<div style="flex: 1.8;">
 
 <p align="center">
     <img src="pics/20.png" width=600>
@@ -1018,7 +1018,7 @@ $$
 
 </div>
 
-<div style="flex: 1; padding-left: 5px;">
+<div style="flex: 1;">
 
 <br><br>
 
